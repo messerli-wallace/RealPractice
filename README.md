@@ -1,25 +1,8 @@
-# Welcome to Next.js
+# RealPractice Time-Based Practice Logger (Work in Progress)
 
-This is the most minimal starter for your Next.js project.
+RealPractice is a social app meant to log and track one's time-based practice (musical instrument practice, meditation, studying, etc). 
+Practice is tracked via logging individual practice sessions. The user inputs time practiced and can provide a title, description, and tags for the type of practice they do.
+Analytics for one's practice is provided on their profile page. Practice time over different intervals is provided.
+Users can follow others, allowing for interaction on individual logs (liking and commenting).
 
-## Deploy your own
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/next.js/tree/canary/examples/hello-world&project-name=hello-world&repository-name=hello-world)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
-
-```bash
-npx create-next-app --example hello-world hello-world-app
-```
-
-```bash
-yarn create next-app --example hello-world hello-world-app
-```
-
-```bash
-pnpm create next-app --example hello-world hello-world-app
-```
-
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+Development is done by two university students using Next.js and Firebase.
