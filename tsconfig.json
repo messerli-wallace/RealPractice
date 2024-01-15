@@ -22,14 +22,15 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "app/feed/page.tsx", "app/context/AuthContext.js"  ],
   "exclude": [
     "node_modules"
   ]
