@@ -1,9 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { UserAuth } from '../context/AuthContext';
-import LoadingImage from '../_components/LoadingGif';
+import { UserAuth } from '../../context/AuthContext';
+import LoadingImage from '../../_components/LoadingGif';
 
-const page = () => {
+const profilePage = () => {
     const {user} = UserAuth(); //user data if logged in
     const [loading,setLoading] = useState(true);
 
@@ -18,6 +18,7 @@ const page = () => {
     return (
         <div className='p-4'>
         {loading ? (<LoadingImage />) : user ? (
+                // user info 
                 <p>Welcome, {user.displayName}</p>
             ) : (
                 <div className='p-4'>
@@ -30,4 +31,4 @@ const page = () => {
     )
 }
 
-export default page
+export default profilePage
