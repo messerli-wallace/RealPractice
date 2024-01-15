@@ -17,7 +17,7 @@ const Navbar = () => {
 
     const handleSignOut = async () => {
         try {
-            await logOut();
+            await signOut(user);
         } catch (error) {
             console.log(error);
         }
@@ -40,12 +40,12 @@ const Navbar = () => {
                     <Link href='/'>Home</Link>
                 </li>
                 <li className='p-2 cursor-pointer'>
-                    <Link href='/feed'>Feed</Link>
+                    <Link href='/home/search'>Search</Link>
                 </li>
 
                 {!user ? null : (
                 <li className='p-2 cursor-pointer'>
-                    <Link href='/profile'>Profile</Link>
+                    <Link href='/home/profile'>Profile</Link>
                 </li>
                 )}
                 
