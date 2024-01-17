@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
 // FINISH THIS WHEN STYLING IS INCORPORATED
 export default function LikeButton() {
@@ -8,16 +8,16 @@ export default function LikeButton() {
 
     function handleLikeClick() {
         if (like == true) {
-            console.log('true');
+            console.log("true");
         } 
         else {
-            console.log('false');
+            console.log("false");
         }
         setLike(!like);
     }
 
     const strLike = String(like);
 
-    return <button title='button' type='button' onClick={handleLikeClick}>({strLike})</button>
+    return <button title="button" type="button" onClick={handleLikeClick}>({strLike})</button>
     
 }
