@@ -1,41 +1,65 @@
 "use client";
 
-import React, { useState } from "react";
-import DateTimePicker from 'react-datetime-picker';
-import 'react-datetime-picker/dist/DateTimePicker.css';
-import 'react-calendar/dist/Calendar.css';
-import 'react-clock/dist/Clock.css';
+import { useState } from "react";
+import DateTimePicker from "react-datetime-picker";
+import "react-datetime-picker/dist/DateTimePicker.css";
+import "react-calendar/dist/Calendar.css";
+import "react-clock/dist/Clock.css";
 import { UserAuth } from "../context/AuthContext";
+import { createData, readData, updateData, deleteData} from "../db.js"; 
 
+
+// Typescript declarations for the date-time component in the log form
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
-
-
 
 export default function CreateLog() {
     const [description, setDescription] = useState("");
     const [duration, setDuration] = useState(""); // not implemented yet
     const [datetime, changeDatetime] = useState<Value>(new Date());
     const [isLoading,setLoading] = useState(false); // for when the form is submitted
-    const [tags, setTags] = useState(['other']);
+    const [tags, setTags] = useState(["other"]);
+    const { user } = UserAuth();
 
-    const { user, googleSignIn, logOut } = UserAuth();
-    
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLoading(true);
+        e.preventDefault(); // prevents refresh after submissions
+        setLoading(true);   // stops user from inputting another log when current log is being processed
 
+        const dateTimeStr = datetimeToString(datetime);
         const ticket = {
-            datetime, duration, description, tags,
+            duration, description, tags
         }
+        //try logging
+        try {
+            const logPath = 'users/'+user.uid+'/logs/'+dateTimeStr;
+            console.log(logPath);
+            const result = await createData(
+            logPath, ticket); //writes the log ticket
+
+            const userData = await readData(logPath); //reads the log
+            console.log('log data:', userData);
+            
+            // await updateData('users', {'email': 'jack@gmail.com'});
+            // await deleteData('users');
+          } catch (error) {
+            console.error('Error writing data:', error);
+          }
+        setLoading(false);
     }
 
     return (
-        <form className="w-screen flex border border-solid border-grey">
+        <div className="p-4">
+        <h1 className="text-2xl">New Log</h1>
+        {user ? (
+        <form onSubmit={handleSubmit} id="createLog" className="w-screen flex border border-solid border-grey">
             
             <label>
                 <span>Date and time:</span>
-                <DateTimePicker onChange={changeDatetime} value={datetime} autoFocus={true}/>
+                <DateTimePicker 
+                onChange={changeDatetime} 
+                value={datetime} 
+                autoFocus={true}
+                />
             </label> 
             <label>
                 <span>Duration (minutes):</span>
@@ -81,13 +105,40 @@ export default function CreateLog() {
             <button 
                 className="p-4 border border-solid border-grey" 
                 disabled={isLoading}
-                type="button"
+                type="submit"
             >
                 {isLoading && <span>Adding to log!</span>}
                 {!isLoading && <span>Submit</span>}
             </button>
         </form>
-    );
+        ) : ( 
+        <div className="p-4">
+        You must be logged in to add a log.
+        </div>
+        )}
+        </div>
+    ); 
+}
+
+function datetimeToString(datetime) {
+    /* 
+    returns a date-time object to a string in the format {MM}-{DD}-{YYYY}-{HH}-{MM}-GMT-{N} 
+    */
+    //Specify the options for the output format
+    const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'shortOffset',
+        hour12: false
+    } as Intl.DateTimeFormatOptions;
+    const str_date = datetime?.toLocaleString([],options);
+    const arrDT = str_date?.split(/[\s:,/]+/); //split on all the separating characters
+    // format ['MM', 'DD', 'YYYY', 'HH', 'MM', 'GMT-6']
+    const outDT = arrDT?.join('-');
+    return outDT;
 }
 
 // Define the interfaces for the tag option object, needed in TypeScript implementation that currently isn't being used
