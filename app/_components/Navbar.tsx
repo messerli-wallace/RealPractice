@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { UserAuth } from "../context/AuthContext";
 import { signOut } from "firebase/auth";
@@ -10,6 +10,7 @@ const Navbar = () => {
     const handleSignIn = async () => {
         try {
             await googleSignIn();
+            
         } catch(error) {
             console.log(error);
         }
@@ -22,7 +23,7 @@ const Navbar = () => {
             console.log(error);
         }
     }; 
-
+    // console.log(user);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

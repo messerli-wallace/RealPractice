@@ -7,12 +7,12 @@ export default function LikeButton() {
     const[like, setLike] = useState(false);
 
     function handleLikeClick() {
-        if (like == true) {
-            console.log("true");
-        } 
-        else {
-            console.log("false");
-        }
+        // if (like == true) {
+        //     console.log("true");
+        // } 
+        // else {
+        //     console.log("false");
+        // }
         setLike(!like);
     }
 
