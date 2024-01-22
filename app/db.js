@@ -1,7 +1,9 @@
+import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, get, update, remove } from "firebase/database";
-import { app } from "/app/firebase.tsx";
+import { config2 } from "/app/firebase.tsx";
 
-const db = getDatabase(app);
+const app = initializeApp(config2);
+export const db = getDatabase(app);
 
 //Read Data
 export const readData = async (path) => {

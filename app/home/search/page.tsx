@@ -1,10 +1,36 @@
+'use client'
+import React, { useState } from 'react';
+import { performFirebaseQuery } from "../search/query.tsx";
 
-const searchPage = () => {
+const HomePage: React.FC = () => {
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [searchResult, setSearchResult] = useState<any | null>(null);
+
+    const handleSearch = async () => {
+       const searchResult = await performFirebaseQuery(searchTerm)
+       setSearchResult(searchResult);
+    };
+
     return (
-        <div className="text-3xl font-bold underline">
-            search page, where users can search to follow people
-        </div>
-    )
-}
+      <div>
+        <br></br>
+        <h1>Search Page</h1>
+        <input
+          type="text"
+          placeholder="Enter search term"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
 
-export default searchPage
+        {searchResult && (
+        <div>
+          <h2>Search Result:</h2>
+          <pre>{JSON.stringify(searchResult, null, 2)}</pre>
+        </div>
+      )}
+      </div>
+    );
+  };
+  
+  export default HomePage;
