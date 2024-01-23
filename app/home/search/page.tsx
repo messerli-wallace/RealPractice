@@ -1,13 +1,13 @@
 'use client'
 import React, { useState } from 'react';
-import { performFirebaseQuery } from "../search/query.tsx";
+import { queryUserByName } from "../search/query.tsx";
 
 const HomePage: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchResult, setSearchResult] = useState<any | null>(null);
 
     const handleSearch = async () => {
-       const searchResult = await performFirebaseQuery(searchTerm)
+       const searchResult = await queryUserByName(searchTerm);
        setSearchResult(searchResult);
     };
 

@@ -19,7 +19,9 @@ const profilePage = () => {
         <div className="p-4">
         {loading ? (<LoadingImage />) : user ? (
                 // user info 
+                <div>
                 <p>Welcome, {user.displayName}</p>
+                </div>
             ) : (
                 <div className="p-4">
                     You must be logged in to view this page - protected route.
@@ -31,4 +33,4 @@ const profilePage = () => {
     )
 }
 
-export default profilePage
+export default profilePage;
