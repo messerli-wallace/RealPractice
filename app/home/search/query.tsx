@@ -1,21 +1,20 @@
-import firebase, { initializeApp } from 'firebase/app';
-import { getDatabase, ref, DataSnapshot, query, orderByChild, equalTo, get } from 'firebase/database';
-import { config2 } from "../../firebase.tsx";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../firebase";
 
-
-const app = initializeApp(config2);
-const database = getDatabase(app);
 
 // Function to perform a query
-export const performFirebaseQuery = async (search: string): Promise<any> => {
-    const dataRef = ref(database, `userbase/users/${search}`);
-    const q = query(dataRef, orderByChild('post1'));
-    try {
-        const snapshot: DataSnapshot = await get(q);
-        const data = snapshot.val();
-        return data;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return 'Error fetching data:';
-    }
+export const queryUserByName = async (search: string): Promise<any> => {
+    // https://firebase.google.com/docs/firestore/query-data/queries?authuser=0
+    const coll = collection(db, "users");
+    const q = query(coll, where("name", "==", search));
+
+    const targetAccounts = await getDocs(q);
+
+    const returnData: any[] = [];
+    targetAccounts.forEach((doc) => {
+        // console.log(doc.id, " => ", doc.data());
+        returnData.push({[doc.id]: doc.data()});
+    });
+    // console.log(returnData);
+    return returnData;
 };

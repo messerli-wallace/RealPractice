@@ -6,7 +6,7 @@ import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
 import { UserAuth } from "../context/AuthContext";
-import { createData, readData, updateData, deleteData} from "../db.js"; 
+import { addLog, docExists, createData } from "../_db/db.js"; 
 
 
 // Typescript declarations for the date-time component in the log form
@@ -14,6 +14,7 @@ type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 export default function CreateLog() {
+    // https://youtu.be/nSfu7sHPE9M?si=vBRp3uHl2pKxk0ZI
     const [description, setDescription] = useState("");
     const [duration, setDuration] = useState(""); // not implemented yet
     const [datetime, changeDatetime] = useState<Value>(new Date());
@@ -27,20 +28,15 @@ export default function CreateLog() {
 
         const dateTimeStr = datetimeToString(datetime);
         const ticket = {
-            duration, description, tags
+            dateTimeStr, duration, description, tags
         }
         //try logging
         try {
-            const logPath = 'users/'+user.uid+'/logs/'+dateTimeStr;
-            console.log(logPath);
-            const result = await createData(
+            await docExists(user.uid);
+            const logPath = user.uid;
+            await addLog(
             logPath, ticket); //writes the log ticket
 
-            const userData = await readData(logPath); //reads the log
-            console.log('log data:', userData);
-            
-            // await updateData('users', {'email': 'jack@gmail.com'});
-            // await deleteData('users');
           } catch (error) {
             console.error('Error writing data:', error);
           }
