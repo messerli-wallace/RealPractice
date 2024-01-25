@@ -1,6 +1,7 @@
 import React, { useContext, createContext, useState, useEffect} from "react";
 import {signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut} from "firebase/auth";
 import { auth } from "../firebase";
+import { docExists } from "../_db/db";
 
 const AuthContext = createContext();
 
@@ -18,7 +19,10 @@ export const AuthContextProvider = ({children}) => {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser)
+            setUser(currentUser);
+            if (currentUser !== null) { // check if the signed in user has a document
+                docExists(currentUser.uid);
+            }
         })
         return () => unsubscribe()
     }, [user]);
