@@ -43,6 +43,16 @@ export default function CreateLog() {
         setLoading(false);
     }
 
+    const handleChangeDuration = (e) => {
+        // https://stackoverflow.com/questions/43067719/how-to-allow-only-numbers-in-textbox-in-reactjs#:~:text=Basic%20idea%20is%3A,value%20is%20a%20valid%20number.
+        const re = /^[0-9\b]+$/; //regex
+
+        //if the value isn't blank, check the input against the regex
+        if (e === '' || re.test(e)) {
+            setDuration(e);
+        }
+    };
+
     return (
         <div className="p-4">
         <h1 className="text-2xl">New Log</h1>
@@ -62,7 +72,7 @@ export default function CreateLog() {
                 <textarea 
                     className="border border-solid border-grey"
                     required
-                    onChange={(e) => setDuration(e.target.value)} // does not currently check for input type
+                    onChange={(e) => handleChangeDuration(e.target.value)} 
                     value={duration}
                     cols={4}
                 />
@@ -92,6 +102,7 @@ export default function CreateLog() {
                     }}
                 >
                     <option value="music">Music</option>
+                    <option value="piano">Piano</option>
                     <option value="meditation">Meditation</option>
                     <option value="studying">Studying</option>
                     <option value="other">Other</option>
