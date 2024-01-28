@@ -6,7 +6,6 @@ import LoadingImage from "../../_components/LoadingGif";
 const profilePage = () => {
     const {user} = UserAuth(); //user data if logged in
     const [loading,setLoading] = useState(true);
-
     useEffect(() => {
         const checkAuthentication = async () => {
             await new Promise((resolve) => setTimeout(resolve, 50))
