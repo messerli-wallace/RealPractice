@@ -8,16 +8,15 @@ import {
 import { db } from "../firebase";
 
 export async function getRecentPosts(name: string) {
-  const allFriendData: unknown[] = [];
+  const allFriendData: { [key: string]: LogEntry[] }[] = [];
   const userdata = await getFriends(name);
   const flattenedUserData = userdata.flat();
   for (const friendName of flattenedUserData) {
     const friendData = await queryUserByName(friendName);
-    allFriendData.push(friendData);
+    allFriendData.push(...friendData); // Spread the array elements instead of pushing the array itself
   }
-  const flattendallFriendData = allFriendData.flat();
 
-  const sortedData = organizeAndSortData(flattendallFriendData); // Sort the data by datetime
+  const sortedData = organizeAndSortData(allFriendData); // Sort the data by datetime
   return sortedData;
 }
 
