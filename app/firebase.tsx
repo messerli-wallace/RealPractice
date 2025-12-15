@@ -1,12 +1,11 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { bigboy } from "../../firebaseconfig.js"; // not needed on release
+import firebaseConfig from "../lib/config/firebaseConfig";
 
-const config = bigboy; //change to actual config on firebase push.
-// Initialize Firebase
-export const app = initializeApp(config);
+// Initialize Firebase with environment variables
+const app = initializeApp(firebaseConfig);
 
+export { app };
 export const db = getFirestore(app);
-
 export const auth = getAuth(app);

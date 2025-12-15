@@ -16,12 +16,7 @@ export default [
   // Configuration for ES Modules (TypeScript/JavaScript files)
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
-    ignores: [
-      "**/*.config.js",
-      "next.config.js",
-      "postcss.config.js",
-      "tailwind.config.js",
-    ],
+    ignores: ["**/*.config.js"],
   },
   eslint.configs.recommended,
   ...compat.extends("plugin:@typescript-eslint/recommended"),
@@ -31,12 +26,7 @@ export default [
   ...compat.extends("plugin:prettier/recommended"),
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
-    ignores: [
-      "**/*.config.js",
-      "next.config.js",
-      "postcss.config.js",
-      "tailwind.config.js",
-    ],
+    ignores: ["**/*.config.js"],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -57,24 +47,6 @@ export default [
       "react/prop-types": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "prettier/prettier": ["error", { endOfLine: "auto" }],
-    },
-  },
-  // Configuration for CommonJS config files
-  {
-    files: [
-      "**/*.config.js",
-      "next.config.js",
-      "postcss.config.js",
-      "tailwind.config.js",
-    ],
-    languageOptions: {
-      globals: {
-        module: "readonly",
-      },
-      sourceType: "commonjs",
-    },
-    rules: {
-      "no-undef": "off",
     },
   },
 ];
