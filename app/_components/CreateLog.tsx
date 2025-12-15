@@ -6,7 +6,7 @@ import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
 import { UserAuth } from "../context/AuthContext";
-import { addLog } from "../_db/db.js";
+import { addLog } from "../_db/db";
 
 // Typescript declarations for the date-time component in the log form
 type ValuePiece = Date | null;
@@ -34,8 +34,10 @@ export default function CreateLog() {
     };
     //try logging
     try {
-      const logPath = user.uid;
-      await addLog(logPath, ticket); //writes the log ticket
+      if (user) {
+        const logPath = user.uid;
+        await addLog(logPath, ticket); //writes the log ticket
+      }
     } catch (error) {
       console.error("Error writing data:", error);
     }

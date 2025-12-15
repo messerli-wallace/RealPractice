@@ -28,8 +28,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/home/search/page.tsx",
-    "app/context/AuthContext.js",
-    "app/home/profile/profileQuery.js"
+    "app/context/AuthContext.tsx"
   ],
   "exclude": ["node_modules"]
 }
