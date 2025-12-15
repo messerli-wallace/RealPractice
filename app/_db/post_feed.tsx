@@ -5,7 +5,7 @@ import {
   where,
   DocumentSnapshot,
 } from "firebase/firestore";
-import { db } from "/app/firebase.tsx";
+import { db } from "../firebase";
 
 export async function getRecentPosts(name: string) {
   const allFriendData: unknown[] = [];
