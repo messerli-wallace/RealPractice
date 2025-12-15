@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -30,9 +26,10 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "app/home/search/page.tsx", "app/context/AuthContext.js", "app/home/profile/profileQuery.js"  ],
-  "exclude": [
-    "node_modules"
-  ]
+    ".next/types/**/*.ts",
+    "app/home/search/page.tsx",
+    "app/context/AuthContext.js",
+    "app/home/profile/profileQuery.js"
+  ],
+  "exclude": ["node_modules"]
 }
