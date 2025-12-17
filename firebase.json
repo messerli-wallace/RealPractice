@@ -6,11 +6,18 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "lib",
+    "public": "out",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/",
+        "destination": "/home.html"
+      }
     ]
   }
 }

@@ -5,37 +5,8 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
-    "prepare": "husky install"
-  },
-  "dependencies": {
-    "@firebase/auth": "^1.5.1",
-    "autoprefixer": "^10.4.16",
-    "firebase": "^10.7.1",
-    "firebase-admin": "^12.0.0",
-    "next": "^14.1.0",
-    "postcss": "^8.4.33",
-    "react": "^18.2.0",
-    "react-datetime-picker": "^5.6.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^3.4.1"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3.3.3",
-    "@types/node": "20.8.10",
-    "@types/react": "18.2.33",
-    "@types/react-dom": "18.2.14",
-    "@typescript-eslint/eslint-plugin": "^8.49.0",
-    "@typescript-eslint/parser": "^8.49.0",
-    "dotenv": "^17.2.3",
-    "eslint": "^9.39.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.5.4",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "husky": "^8.0.0",
-    "lint-staged": "^16.2.7",
-    "prettier": "^3.7.4",
-    "typescript": "^5.2.2"
+    "prepare": "husky install",
+    "build:firebase": "npm run build",
+    "deploy:firebase": "npm run build:firebase && firebase deploy"
   }
 }
