@@ -5,6 +5,7 @@
 **RealPractice** is a social time-based practice logging application built with Next.js and Firebase. The app allows users to track and log their practice sessions (musical instruments, meditation, studying, etc.) with detailed analytics, social features, and community interaction.
 
 ### Key Features
+
 - **Practice Logging**: Track practice sessions with duration, descriptions, and tags
 - **User Profiles**: View practice analytics and statistics over time
 - **Social Features**: Follow other users, like and comment on practice logs
@@ -14,6 +15,7 @@
 ## Architecture
 
 ### Technology Stack
+
 - **Frontend**: Next.js 14 with React functional components and hooks
 - **Database**: Firebase Firestore (NoSQL document database)
 - **Authentication**: Firebase Authentication with Google Auth Provider
@@ -21,12 +23,14 @@
 - **State Management**: React Context API for authentication state
 
 ### Component Structure
+
 - **Core Components**: `Navbar`, `post`, `like-button`, `CreateLog`, `LoadingGif`
 - **Database Layer**: `app/_db/db.ts` with Firebase CRUD operations
 - **Authentication**: `app/context/AuthContext.tsx` for user session management
 - **Firebase Integration**: `app/firebase.tsx` for Firebase initialization
 
 ### Data Flow
+
 1. **User Authentication**: Firebase Auth → AuthContext → Protected routes
 2. **Data Operations**: UI Components → Database functions → Firestore
 3. **Real-time Updates**: Firestore listeners → React state updates
@@ -57,11 +61,14 @@
 ## Firebase Configuration
 
 ### Security Rules
+
 The project uses Firebase Firestore security rules defined in `firebase.rules`:
+
 - **Read Access**: Public read access for all user documents (adjust for production)
 - **Write Access**: Authenticated users can only write to their own documents
 
 ### Services Used
+
 - **Firestore Database**: Stores user data, practice logs, and social connections
 - **Firebase Authentication**: Handles user sign-in/sign-up with Google provider
 - **Firebase App**: Core Firebase initialization and configuration
@@ -71,16 +78,19 @@ The project uses Firebase Firestore security rules defined in `firebase.rules`:
 Currently, the project has no formal testing setup. Recommended testing approach:
 
 ### Unit Testing
+
 - **Framework**: Jest with React Testing Library
 - **Coverage**: Component rendering, user interactions, utility functions
 - **Mocking**: Firebase services using `@firebase/rules-unit-testing`
 
 ### Integration Testing
+
 - **Authentication Flow**: Sign-in/sign-out processes
 - **Database Operations**: CRUD operations validation
 - **Real-time Updates**: Firestore listener testing
 
 ### End-to-End Testing
+
 - **Framework**: Cypress or Playwright
 - **Scenarios**: User registration, practice logging, social interactions
 

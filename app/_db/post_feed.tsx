@@ -6,9 +6,10 @@ import {
   DocumentSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { UserLogData, OrganizedLogEntry } from "../../types";
 
 export async function getRecentPosts(name: string) {
-  const allFriendData: { [key: string]: LogEntry[] }[] = [];
+  const allFriendData: UserLogData[] = [];
   const userdata = await getFriends(name);
   const flattenedUserData = userdata.flat();
   for (const friendName of flattenedUserData) {
@@ -37,16 +38,7 @@ const getFriends = async (search: string): Promise<string[]> => {
   return friendsArrays;
 };
 
-interface LogEntry {
-  dateTimeStr: string;
-  duration: string;
-  tags: string[];
-  description: string | null;
-}
-
-const queryUserByName = async (
-  search: string
-): Promise<{ [key: string]: LogEntry[] }[]> => {
+const queryUserByName = async (search: string): Promise<UserLogData[]> => {
   const coll = collection(db, "users");
   const q = query(coll, where("name", "==", search));
 
@@ -62,25 +54,9 @@ const queryUserByName = async (
   });
 };
 
-function organizeAndSortData(
-  userData: {
-    [key: string]: LogEntry[];
-  }[]
-): {
-  user: string;
-  dateTimeStr: string;
-  duration: string;
-  tags: string[];
-  description: string | null;
-}[] {
+function organizeAndSortData(userData: UserLogData[]): OrganizedLogEntry[] {
   // Flatten and organize the data into the desired format
-  const organizedData: {
-    user: string;
-    dateTimeStr: string;
-    duration: string;
-    tags: string[];
-    description: string | null;
-  }[] = [];
+  const organizedData: OrganizedLogEntry[] = [];
 
   userData.forEach((user) => {
     const userKeys = Object.keys(user);
