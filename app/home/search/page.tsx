@@ -1,12 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { queryUserByName } from "../search/query.tsx";
-
-interface SearchResultItem {
-  [key: string]: unknown;
-}
-
-type SearchResult = SearchResultItem[];
+import { SearchResult } from "../../../types";
 
 const HomePage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");

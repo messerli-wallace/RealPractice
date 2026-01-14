@@ -2,6 +2,7 @@
 import "../globals.css";
 import Navbar from "../_components/Navbar";
 import { AuthContextProvider } from "../context/AuthContext";
+import { ErrorBoundary } from "../_components/ErrorBoundary";
 
 export default function RootLayout({
   children,
@@ -13,8 +14,10 @@ export default function RootLayout({
       {/* This is where shared UI would go, like header or sidebar */}
       <body>
         <AuthContextProvider>
-          <Navbar />
-          {children}
+          <ErrorBoundary>
+            <Navbar />
+            {children}
+          </ErrorBoundary>
         </AuthContextProvider>
       </body>
     </html>

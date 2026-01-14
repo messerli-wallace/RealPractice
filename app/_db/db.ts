@@ -8,115 +8,241 @@ import {
   arrayRemove,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import {
+  UserData,
+  LogItem,
+  User,
+  validateUserData,
+  validateLogItem,
+} from "../../types";
+import { logError } from "../../lib/utils/errorLogger";
 
-interface UserData {
-  name?: string | null;
-  logs?: LogItem[];
-  friends?: string[];
-  [key: string]: unknown;
-}
-
-interface LogItem {
-  dateTimeStr: string;
-  duration: string;
-  description: string;
-  tags: string[];
-  [key: string]: unknown;
+/**
+ * Helper function to check if an error is network-related
+ */
+function isNetworkError(error: unknown): boolean {
+  if (error instanceof Error) {
+    return (
+      error.message.includes("network") ||
+      error.message.includes("timeout") ||
+      error.message.includes("failed to fetch") ||
+      error.message.includes("offline")
+    );
+  }
+  return false;
 }
 
 export const createData = async (
   docPath: string,
-  data: UserData
+  data: UserData,
+  retryCount = 0
 ): Promise<void> => {
   /*
    Creates a document and adds data to it. 
    Will merge an existing document with the same docPath
    */
-  const docRef = doc(db, "users", docPath);
-  await setDoc(docRef, data, { merge: true });
+  try {
+    const docRef = doc(db, "users", docPath);
+    await setDoc(docRef, data, { merge: true });
+  } catch (error) {
+    // Log the error with context
+    if (error instanceof Error) {
+      logError("Failed to create document", error, {
+        component: "db",
+        function: "createData",
+        metadata: { docPath, retryCount },
+      });
+    }
+
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      await createData(docPath, data, retryCount + 1);
+    } else {
+      throw error;
+    }
+  }
 };
 
 export const readData = async (
-  docPath: string
+  docPath: string,
+  retryCount = 0
 ): Promise<UserData | undefined> => {
   /*
    Reads data from docPath
    https://firebase.google.com/docs/firestore/query-data/get-data?authuser=0
    */
-  const docRef = doc(db, "users", docPath);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data() as UserData | undefined;
+  try {
+    const docRef = doc(db, "users", docPath);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    return validateUserData(data) || undefined;
+  } catch (error) {
+    // Log the error with context
+    if (error instanceof Error) {
+      logError("Failed to read document", error, {
+        component: "db",
+        function: "readData",
+        metadata: { docPath, retryCount },
+      });
+    }
+
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      return readData(docPath, retryCount + 1);
+    }
+    throw error;
+  }
 };
 
 export const updateData = async (
   docPath: string,
-  data: Partial<UserData>
+  data: Partial<UserData>,
+  retryCount = 0
 ): Promise<void> => {
   /*
    updates the docPath document with the inputted data
    */
-  const docRef = doc(db, "users", docPath);
-  await updateDoc(docRef, data);
+  try {
+    const docRef = doc(db, "users", docPath);
+    await updateDoc(docRef, data);
+  } catch (error) {
+    // Log the error with context
+    if (error instanceof Error) {
+      logError("Failed to update document", error, {
+        component: "db",
+        function: "updateData",
+        metadata: { docPath, retryCount },
+      });
+    }
+
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      await updateData(docPath, data, retryCount + 1);
+    } else {
+      throw error;
+    }
+  }
 };
 
-export const deleteData = async (docPath: string): Promise<void> => {
+export const deleteData = async (
+  docPath: string,
+  retryCount = 0
+): Promise<void> => {
   /*
    Deletes the document at docPath
    */
-  const docRef = doc(db, "users", docPath);
-  await deleteDoc(docRef);
+  try {
+    const docRef = doc(db, "users", docPath);
+    await deleteDoc(docRef);
+  } catch (error) {
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      await deleteData(docPath, retryCount + 1);
+    } else {
+      throw error;
+    }
+  }
 };
 
 // array methods for logs
 
 export const addLog = async (
   docPath: string,
-  newLog: LogItem
+  newLog: LogItem,
+  retryCount = 0
 ): Promise<void> => {
   /*
    Adds a specific log to the logs array in the docPath
    */
-  const docRef = doc(db, "users", docPath);
-  await updateDoc(docRef, {
-    logs: arrayUnion(newLog),
-  });
+  if (!validateLogItem(newLog)) {
+    throw new Error("Invalid log item data");
+  }
+
+  try {
+    const docRef = doc(db, "users", docPath);
+    await updateDoc(docRef, {
+      logs: arrayUnion(newLog),
+    });
+  } catch (error) {
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      await addLog(docPath, newLog, retryCount + 1);
+    } else {
+      throw error;
+    }
+  }
 };
 
 export const removeLog = async (
   docPath: string,
-  badLog: LogItem
+  badLog: LogItem,
+  retryCount = 0
 ): Promise<void> => {
   /*
    Deletes a specific log
    */
-  const docRef = doc(db, "users", docPath);
-  await updateDoc(docRef, {
-    logs: arrayRemove(badLog),
-  });
+  try {
+    const docRef = doc(db, "users", docPath);
+    await updateDoc(docRef, {
+      logs: arrayRemove(badLog),
+    });
+  } catch (error) {
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      await removeLog(docPath, badLog, retryCount + 1);
+    } else {
+      throw error;
+    }
+  }
 };
 
 // Misc functions
 
-interface User {
-  uid: string;
-  displayName: string | null;
-}
-
 export const docExists = async (
   docName: string,
-  user: User
+  user: User,
+  retryCount = 0
 ): Promise<boolean> => {
   /**
    * Checks to see if a document exists of that name in the users collection
    * If the doc doesn't exists, this function creates it
    */
-  const docRef = doc(db, "users", docName);
-  const docSnap = await getDoc(docRef);
+  try {
+    const docRef = doc(db, "users", docName);
+    const docSnap = await getDoc(docRef);
 
-  if (docSnap.exists()) {
-    return true;
-  } else {
-    createData(user.uid, { name: user.displayName });
-    return false;
+    if (docSnap.exists()) {
+      return true;
+    } else {
+      await createData(user.uid, { name: user.displayName });
+      return false;
+    }
+  } catch (error) {
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      return docExists(docName, user, retryCount + 1);
+    }
+    throw error;
   }
 };

@@ -9,7 +9,24 @@ const Navbar = () => {
     try {
       await googleSignIn();
     } catch (error) {
-      console.log(error);
+      // Enhanced error handling for authentication
+      let errorMessage = "Failed to sign in. Please try again.";
+
+      if (error instanceof Error) {
+        if (error.message.includes("network")) {
+          errorMessage = "Network error. Please check your connection.";
+        } else if (
+          error.message.includes("popup") ||
+          error.message.includes("cancel")
+        ) {
+          errorMessage = "Sign in was cancelled.";
+        } else if (error.message.includes("auth")) {
+          errorMessage = "Authentication failed. Please try again.";
+        }
+      }
+
+      // Show user-friendly error
+      alert(errorMessage);
     }
   };
   // console.log(user);
