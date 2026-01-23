@@ -4,6 +4,7 @@ import "react-datetime-picker/dist/DateTimePicker.css";
 import "react-calendar/dist/Calendar.css";
 import "react-clock/dist/Clock.css";
 import { DateTimePickerProps } from "./types";
+import { FormField } from "./FormField";
 
 export function DateTimePickerField({
   value,
@@ -11,15 +12,13 @@ export function DateTimePickerField({
   error,
 }: DateTimePickerProps) {
   return (
-    <label htmlFor="datetime-picker">
-      <span>Date and time:</span>
+    <FormField label="Date and time:" error={error}>
       <DateTimePicker
         id="datetime-picker"
         onChange={onChange}
         value={value}
         className={error ? "border-red-500" : ""}
       />
-      {error && <div className="text-red-500 text-sm">{error}</div>}
-    </label>
+    </FormField>
   );
 }

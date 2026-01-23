@@ -6,16 +6,27 @@ import {
   deleteDoc,
   arrayUnion,
   arrayRemove,
+  Firestore,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, isConfigured } from "../firebase";
 import {
   UserData,
   LogItem,
   User,
   validateUserData,
   validateLogItem,
-} from "../../types";
+  ErrorMetadata,
+} from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
+
+function getDb(): Firestore {
+  if (!isConfigured || !db) {
+    throw new Error(
+      "Firebase is not configured. Please set up your Firebase credentials."
+    );
+  }
+  return db;
+}
 
 /**
  * Helper function to check if an error is network-related
@@ -42,15 +53,22 @@ export const createData = async (
    Will merge an existing document with the same docPath
    */
   try {
+    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await setDoc(docRef, data, { merge: true });
   } catch (error) {
     // Log the error with context
     if (error instanceof Error) {
+      const metadata: ErrorMetadata = {
+        docPath,
+        retryCount,
+        component: "db",
+        function: "createData",
+      };
       logError("Failed to create document", error, {
         component: "db",
         function: "createData",
-        metadata: { docPath, retryCount },
+        metadata,
       });
     }
 
@@ -73,12 +91,16 @@ export const readData = async (
   /*
    Reads data from docPath
    https://firebase.google.com/docs/firestore/query-data/get-data?authuser=0
-   */
+    */
   try {
+    const db = getDb();
     const docRef = doc(db, "users", docPath);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data();
-    return validateUserData(data) || undefined;
+    if (validateUserData(data)) {
+      return data;
+    }
+    return undefined;
   } catch (error) {
     // Log the error with context
     if (error instanceof Error) {
@@ -106,9 +128,10 @@ export const updateData = async (
   retryCount = 0
 ): Promise<void> => {
   /*
-   updates the docPath document with the inputted data
-   */
+    updates the docPath document with the inputted data
+    */
   try {
+    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await updateDoc(docRef, data);
   } catch (error) {
@@ -138,9 +161,10 @@ export const deleteData = async (
   retryCount = 0
 ): Promise<void> => {
   /*
-   Deletes the document at docPath
-   */
+    Deletes the document at docPath
+    */
   try {
+    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await deleteDoc(docRef);
   } catch (error) {
@@ -164,13 +188,14 @@ export const addLog = async (
   retryCount = 0
 ): Promise<void> => {
   /*
-   Adds a specific log to the logs array in the docPath
-   */
+    Adds a specific log to the logs array in the docPath
+    */
   if (!validateLogItem(newLog)) {
     throw new Error("Invalid log item data");
   }
 
   try {
+    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await updateDoc(docRef, {
       logs: arrayUnion(newLog),
@@ -194,9 +219,10 @@ export const removeLog = async (
   retryCount = 0
 ): Promise<void> => {
   /*
-   Deletes a specific log
-   */
+    Deletes a specific log
+    */
   try {
+    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await updateDoc(docRef, {
       logs: arrayRemove(badLog),
@@ -226,13 +252,14 @@ export const docExists = async (
    * If the doc doesn't exists, this function creates it
    */
   try {
+    const db = getDb();
     const docRef = doc(db, "users", docName);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       return true;
     } else {
-      await createData(user.uid, { name: user.displayName });
+      await createData(user.uid, { name: user.displayName, email: user.email });
       return false;
     }
   } catch (error) {

@@ -6,15 +6,18 @@ export function FormField({
   error,
   required,
   children,
-}: FormFieldProps) {
+  className = "",
+}: FormFieldProps & { className?: string }) {
   return (
-    <label>
-      <span>
-        {label}
-        {required && "*"}
-      </span>
-      {children}
-      {error && <div className="text-red-500 text-sm">{error}</div>}
-    </label>
+    <div className={`form-field mb-4 ${className}`}>
+      <label className="block mb-2">
+        <span className="text-sm font-medium text-gray-700">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </span>
+        {children}
+      </label>
+      {error && <div className="text-red-500 text-sm mt-1">{error}</div>}
+    </div>
   );
 }

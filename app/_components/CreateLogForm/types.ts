@@ -28,6 +28,7 @@ export interface FormFieldProps {
   error?: string;
   required?: boolean;
   children: React.ReactNode;
+  className?: string;
 }
 
 export interface DateTimePickerProps {
@@ -39,22 +40,27 @@ export interface DateTimePickerProps {
 export interface DurationInputProps {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   error?: string;
 }
 
 export interface DescriptionInputProps {
   value: string;
   onChange: (value: string) => void;
+  onBlur?: () => void;
   error?: string;
 }
 
 export interface TagSelectorProps {
   value: string[];
   onChange: (tags: string[]) => void;
+  onBlur?: () => void;
   error?: string;
 }
 
 export interface SubmitButtonProps {
   isLoading: boolean;
   disabled?: boolean;
+  className?: string;
+  children?: React.ReactNode;
 }

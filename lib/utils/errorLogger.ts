@@ -3,7 +3,7 @@
  * Provides structured error logging with context and severity levels
  */
 
-import { User } from "../../types";
+import { User } from "../../types/index";
 
 export enum LogLevel {
   INFO = "INFO",
@@ -27,9 +27,59 @@ export interface LogEntry {
   context: ErrorContext;
 }
 
+// Configuration interface for error logging
+export interface ErrorLoggerConfig {
+  maxLogBufferSize?: number;
+  enableConsoleLogging?: boolean;
+  enableLocalStoragePersistence?: boolean;
+  externalLoggingService?: {
+    name: string;
+    apiKey?: string;
+    endpoint?: string;
+  };
+}
+
+// Default configuration
+const defaultConfig: ErrorLoggerConfig = {
+  maxLogBufferSize: 100,
+  enableConsoleLogging: true,
+  enableLocalStoragePersistence: false,
+};
+
 // In-memory log buffer for development
 const logBuffer: LogEntry[] = [];
-const MAX_LOG_BUFFER_SIZE = 100;
+let currentConfig: ErrorLoggerConfig = defaultConfig;
+
+/**
+ * Configure the error logger
+ */
+export function configureErrorLogger(config: Partial<ErrorLoggerConfig>): void {
+  currentConfig = { ...currentConfig, ...config };
+
+  // Apply max log buffer size immediately
+  if (
+    currentConfig.maxLogBufferSize &&
+    logBuffer.length > currentConfig.maxLogBufferSize
+  ) {
+    logBuffer.splice(0, logBuffer.length - currentConfig.maxLogBufferSize);
+  }
+}
+
+// Initialize from localStorage if enabled
+if (
+  typeof window !== "undefined" &&
+  defaultConfig.enableLocalStoragePersistence
+) {
+  try {
+    const savedLogs = localStorage.getItem("realPracticeErrorLogs");
+    if (savedLogs) {
+      const parsedLogs: LogEntry[] = JSON.parse(savedLogs);
+      logBuffer.push(...parsedLogs);
+    }
+  } catch (error) {
+    console.warn("Failed to load logs from localStorage:", error);
+  }
+}
 
 /**
  * Log an error with context information
@@ -98,24 +148,93 @@ function processLogEntry(entry: LogEntry): void {
   logBuffer.push(entry);
 
   // Trim buffer if it exceeds max size
-  if (logBuffer.length > MAX_LOG_BUFFER_SIZE) {
+  if (logBuffer.length > currentConfig.maxLogBufferSize!) {
     logBuffer.shift();
   }
 
-  // Log to console based on severity
-  const consoleMethod = getConsoleMethodForLevel(entry.level);
-
-  consoleMethod(`[${entry.level}] ${entry.message}`);
-
-  if (entry.error) {
-    console.error("Error details:", entry.error);
+  // Persist to localStorage if enabled
+  if (
+    currentConfig.enableLocalStoragePersistence &&
+    typeof window !== "undefined"
+  ) {
+    try {
+      localStorage.setItem("realPracticeErrorLogs", JSON.stringify(logBuffer));
+    } catch (error) {
+      console.warn("Failed to save logs to localStorage:", error);
+    }
   }
 
-  if (entry.context) {
-    console.log("Context:", {
-      ...entry.context,
-      timestamp: entry.context.timestamp.toISOString(),
+  // Log to console if enabled
+  if (currentConfig.enableConsoleLogging) {
+    const consoleMethod = getConsoleMethodForLevel(entry.level);
+
+    consoleMethod(`[${entry.level}] ${entry.message}`);
+
+    if (entry.error) {
+      console.error("Error details:", entry.error);
+    }
+
+    if (entry.context) {
+      console.log("Context:", {
+        ...entry.context,
+        timestamp: entry.context.timestamp.toISOString(),
+      });
+    }
+  }
+
+  // Send to external logging service if configured
+  if (currentConfig.externalLoggingService) {
+    sendToExternalService(entry);
+  }
+}
+
+/**
+ * Send log entry to external logging service
+ */
+async function sendToExternalService(entry: LogEntry): Promise<void> {
+  try {
+    const service = currentConfig.externalLoggingService;
+
+    if (!service || !service.endpoint) {
+      return;
+    }
+
+    // Prepare log data for external service
+    const logData = {
+      level: entry.level,
+      message: entry.message,
+      error: entry.error
+        ? {
+            name: entry.error.name,
+            message: entry.error.message,
+            stack: entry.error.stack,
+          }
+        : undefined,
+      context: entry.context,
+      timestamp: new Date().toISOString(),
+      application: "RealPractice",
+    };
+
+    // Send to external service
+    const response = await fetch(service.endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(service.apiKey
+          ? { Authorization: `Bearer ${service.apiKey}` }
+          : {}),
+      },
+      body: JSON.stringify(logData),
     });
+
+    if (!response.ok) {
+      console.warn(
+        `Failed to send log to ${service.name}:`,
+        response.statusText
+      );
+    }
+  } catch (error) {
+    console.warn("Failed to send log to external service:", error);
   }
 }
 
@@ -145,10 +264,122 @@ export function getLogBuffer(): LogEntry[] {
 }
 
 /**
+ * Get logs filtered by criteria
+ */
+export function getFilteredLogs(criteria: {
+  level?: LogLevel | LogLevel[];
+  component?: string;
+  minTimestamp?: Date;
+  maxTimestamp?: Date;
+  searchText?: string;
+}): LogEntry[] {
+  return logBuffer.filter((entry) => {
+    // Filter by level
+    if (criteria.level) {
+      const levels = Array.isArray(criteria.level)
+        ? criteria.level
+        : [criteria.level];
+      if (!levels.includes(entry.level)) {
+        return false;
+      }
+    }
+
+    // Filter by component
+    if (criteria.component && entry.context.component !== criteria.component) {
+      return false;
+    }
+
+    // Filter by timestamp range
+    if (
+      criteria.minTimestamp &&
+      entry.context.timestamp < criteria.minTimestamp
+    ) {
+      return false;
+    }
+
+    if (
+      criteria.maxTimestamp &&
+      entry.context.timestamp > criteria.maxTimestamp
+    ) {
+      return false;
+    }
+
+    // Filter by search text
+    if (criteria.searchText) {
+      const searchLower = criteria.searchText.toLowerCase();
+      const messageMatch = entry.message.toLowerCase().includes(searchLower);
+      const errorMatch = entry.error?.message
+        .toLowerCase()
+        .includes(searchLower);
+      const contextMatch = JSON.stringify(entry.context)
+        .toLowerCase()
+        .includes(searchLower);
+
+      if (!messageMatch && !errorMatch && !contextMatch) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+}
+
+/**
+ * Export logs as JSON string
+ */
+export function exportLogsAsJson(): string {
+  return JSON.stringify(logBuffer, null, 2);
+}
+
+/**
+ * Export logs as CSV string
+ */
+export function exportLogsAsCsv(): string {
+  const headers = [
+    "Timestamp",
+    "Level",
+    "Message",
+    "Error",
+    "Component",
+    "Function",
+    "User ID",
+  ];
+
+  const rows = logBuffer.map((entry) => {
+    const errorMessage = entry.error
+      ? `"${entry.error.message.replace('"', "'")}"`
+      : "";
+    return [
+      entry.context.timestamp.toISOString(),
+      entry.level,
+      `"${entry.message.replace('"', "'")}"`,
+      errorMessage,
+      entry.context.component || "",
+      entry.context.function || "",
+      entry.context.userId || "",
+    ];
+  });
+
+  return [headers, ...rows].map((row) => row.join(",")).join("\n");
+}
+
+/**
  * Clear the log buffer
  */
 export function clearLogBuffer(): void {
   logBuffer.length = 0;
+
+  // Also clear from localStorage if enabled
+  if (
+    currentConfig.enableLocalStoragePersistence &&
+    typeof window !== "undefined"
+  ) {
+    try {
+      localStorage.removeItem("realPracticeErrorLogs");
+    } catch (error) {
+      console.warn("Failed to clear logs from localStorage:", error);
+    }
+  }
 }
 
 /**

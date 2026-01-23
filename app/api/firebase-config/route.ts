@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getFirebaseServerConfig } from "../../../lib/config/firebaseConfig";
+import { logError } from "../../../lib/utils/errorLogger";
 
 export async function GET() {
   try {
@@ -29,7 +30,12 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error("Error fetching Firebase config:", error);
+    if (error instanceof Error) {
+      logError("Error fetching Firebase config", error, {
+        component: "api",
+        function: "firebase-config",
+      });
+    }
     return NextResponse.json(
       { success: false, error: "Failed to load configuration" },
       { status: 500 }

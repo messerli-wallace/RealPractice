@@ -21,6 +21,7 @@
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
+    "@types/react": "19.2.9",
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.53.0",
     "eslint": "^9.39.2",
@@ -34,5 +35,18 @@
     "jest-environment-jsdom": "^30.2.0",
     "prettier": "^3.7.4",
     "ts-jest": "^29.4.6"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "autoprefixer": "^10.4.23",
+    "firebase": "^12.8.0",
+    "next": "^16.1.4",
+    "postcss": "^8.5.6",
+    "react": "^19.2.3",
+    "react-calendar": "^6.0.0",
+    "react-clock": "^6.0.0",
+    "react-datetime-picker": "^7.0.1",
+    "react-dom": "^19.2.3",
+    "tailwindcss": "^4.1.18"
   }
 }

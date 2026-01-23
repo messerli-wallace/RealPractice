@@ -1,10 +1,15 @@
 import React from "react";
 import { TagSelectorProps } from "./types";
+import { FormField } from "./FormField";
 
-export function TagSelector({ value, onChange, error }: TagSelectorProps) {
+export function TagSelector({
+  value,
+  onChange,
+  onBlur,
+  error,
+}: TagSelectorProps) {
   return (
-    <label>
-      <span>Tags:</span>
+    <FormField label="Tags:" error={error} required>
       <select
         className={`border border-solid ${error ? "border-red-500" : "border-grey"}`}
         multiple={true}
@@ -14,6 +19,7 @@ export function TagSelector({ value, onChange, error }: TagSelectorProps) {
           const values = options.map((option) => option.value);
           onChange(values);
         }}
+        onBlur={onBlur}
       >
         <option value="music">Music</option>
         <option value="piano">Piano</option>
@@ -21,7 +27,6 @@ export function TagSelector({ value, onChange, error }: TagSelectorProps) {
         <option value="studying">Studying</option>
         <option value="other">Other</option>
       </select>
-      {error && <div className="text-red-500 text-sm">{error}</div>}
-    </label>
+    </FormField>
   );
 }
