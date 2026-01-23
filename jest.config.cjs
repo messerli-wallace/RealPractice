@@ -9,19 +9,12 @@ module.exports = {
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
   },
   transform: {
-    ...tsjPreset.transform,
     "^.+\\.(ts|tsx)$": [
       "ts-jest",
       {
-        useESM: true,
+        useESM: false,
       },
     ],
   },
   testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
-  extensionsToTreatAsEsm: [".ts", ".tsx"],
-  globals: {
-    "ts-jest": {
-      useESM: true,
-    },
-  },
 };

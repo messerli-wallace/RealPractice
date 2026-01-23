@@ -1,6 +1,6 @@
 require("@testing-library/jest-dom");
 
-// Mock Firebase and other external dependencies
+// Mock Firebase
 global.Firebase = {
   firestore: jest.fn(),
   auth: jest.fn(),
