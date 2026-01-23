@@ -1,18 +1,23 @@
 import React from "react";
 import { DurationInputProps } from "./types";
+import { FormField } from "./FormField";
 
-export function DurationInput({ value, onChange, error }: DurationInputProps) {
+export function DurationInput({
+  value,
+  onChange,
+  onBlur,
+  error,
+}: DurationInputProps) {
   return (
-    <label>
-      <span>Duration (minutes):</span>
+    <FormField label="Duration (minutes):" error={error} required>
       <textarea
         className={`border border-solid ${error ? "border-red-500" : "border-grey"}`}
         required
         onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
         value={value}
         cols={4}
       />
-      {error && <div className="text-red-500 text-sm">{error}</div>}
-    </label>
+    </FormField>
   );
 }

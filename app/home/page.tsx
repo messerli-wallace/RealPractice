@@ -1,48 +1,82 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { getRecentPosts } from "../_db/post_feed.tsx";
+import React, { useRef, useCallback } from "react";
 import CreateLog from "../_components/CreateLog";
 import LikeButton from "../_components/like-button";
 import Post from "../_components/post";
+import { usePosts } from "../context/PostsContext";
+import LoadingGif from "../_components/LoadingGif";
+import { Alert } from "../_components/DesignSystem";
 
 export default function Home() {
-  const [recentPosts, setRecentPosts] = useState<
-    {
-      user: string;
-      dateTimeStr: string;
-      duration: string;
-      tags: string[];
-      description: string | null;
-    }[]
-  >([]);
+  const { posts, loading, error, hasMore, loadMorePosts } = usePosts();
+  const observer = useRef<IntersectionObserver | null>(null);
 
-  useEffect(() => {
-    async function fetchRecentPosts() {
-      try {
-        const posts = await getRecentPosts("Jack M");
-        setRecentPosts(posts);
-      } catch (error) {
-        console.error("Error fetching recent posts:", error);
-      }
-    }
-    fetchRecentPosts();
-  }, []);
+  const lastPostElementRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMorePosts();
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, loadMorePosts]
+  );
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Home</h1>
-      <div>
+    <div className="container mx-auto px-4 py-6">
+      <h1 className="text-3xl font-bold mb-6">Home</h1>
+
+      {error && (
+        <div className="mb-4">
+          <Alert variant="error" title="Error loading posts">
+            {error.message}
+          </Alert>
+        </div>
+      )}
+
+      <div className="mb-8">
         <CreateLog />
       </div>
-      <div>
-        <h1>Recent Posts</h1>
 
-        {recentPosts.map((post, index) => (
-          <React.Fragment key={index}>
-            <LikeButton />
-            <Post key={index} post={{ ...post, index }} />
-          </React.Fragment>
-        ))}
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">Recent Posts</h2>
+
+        {loading && posts.length === 0 ? (
+          <div className="flex justify-center py-8">
+            <LoadingGif />
+          </div>
+        ) : posts.length === 0 ? (
+          <p className="text-gray-500">
+            No posts found. Create your first log!
+          </p>
+        ) : (
+          <div>
+            {posts.map((post, index) => (
+              <React.Fragment key={index}>
+                <LikeButton />
+                <Post post={{ ...post, index }} />
+              </React.Fragment>
+            ))}
+            {loading && hasMore && (
+              <div className="flex justify-center py-4">
+                <p className="text-gray-500">Loading more posts...</p>
+              </div>
+            )}
+            {!hasMore && (
+              <div className="flex justify-center py-4">
+                <p className="text-gray-400 text-sm">
+                  You&apos;ve reached the end!
+                </p>
+              </div>
+            )}
+            <div ref={lastPostElementRef} />
+          </div>
+        )}
       </div>
     </div>
   );

@@ -12,7 +12,7 @@ import {
   signOut,
   User as FirebaseUser,
 } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, isConfigured } from "../firebase";
 import { docExists } from "../_db/db";
 
 interface AuthContextType {
@@ -31,19 +31,29 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
 
   const googleSignIn = () => {
+    if (!isConfigured || !auth) {
+      console.warn("Firebase is not configured. Cannot sign in.");
+      return;
+    }
     const provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider);
   };
 
   const logOut = () => {
+    if (!isConfigured || !auth) {
+      console.warn("Firebase is not configured. Cannot sign out.");
+      return;
+    }
     signOut(auth);
   };
 
   useEffect(() => {
+    if (!isConfigured || !auth) {
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser !== null) {
-        // check if the signed in user has a document
         docExists(currentUser.uid, currentUser);
       }
     });

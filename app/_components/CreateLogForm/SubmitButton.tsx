@@ -1,15 +1,23 @@
 import React from "react";
+import { Button } from "../DesignSystem";
 import { SubmitButtonProps } from "./types";
 
-export function SubmitButton({ isLoading, disabled }: SubmitButtonProps) {
+export function SubmitButton({
+  isLoading,
+  disabled,
+  className = "",
+  children = isLoading ? "Submitting..." : "Submit",
+}: SubmitButtonProps & { className?: string; children?: React.ReactNode }) {
   return (
-    <button
-      className="p-4 border border-solid border-grey"
-      disabled={disabled || isLoading}
+    <Button
       type="submit"
+      variant="primary"
+      size="md"
+      isLoading={isLoading}
+      disabled={disabled}
+      className={className}
     >
-      {isLoading && <span>Adding to log!</span>}
-      {!isLoading && <span>Submit</span>}
-    </button>
+      {children}
+    </Button>
   );
 }

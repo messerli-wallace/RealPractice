@@ -1,12 +1,14 @@
 /**
  * Centralized TypeScript types and interfaces for RealPractice application
  */
+import { logError } from "../lib/utils/errorLogger";
 
 /**
  * User data structure
  */
 export interface UserData {
   name?: string | null;
+  email?: string | null;
   logs?: LogItem[];
   friends?: string[];
   bio?: string;
@@ -19,6 +21,8 @@ export interface UserData {
  * Log item structure
  */
 export interface LogItem {
+  id?: string;
+  userId?: string;
   dateTimeStr: string;
   duration: string;
   description: string;
@@ -64,16 +68,23 @@ export interface OrganizedLogEntry {
 }
 
 /**
- * Search result item - maps user IDs to user data
+ * Search result item with specific properties
  */
 export interface SearchResultItem {
-  [userId: string]: UserData;
+  id: string;
+  name: string;
+  type: "user" | "log";
+  description?: string;
+  tags?: string[];
 }
 
 /**
  * Search result type
  */
-export type SearchResult = SearchResultItem[];
+export interface SearchResult {
+  users: SearchResultItem[];
+  logs: SearchResultItem[];
+}
 
 /**
  * Firebase user interface
@@ -81,6 +92,31 @@ export type SearchResult = SearchResultItem[];
 export interface User {
   uid: string;
   displayName: string | null;
+  email: string | null;
+  emailVerified: boolean;
+  phoneNumber: string | null;
+  photoURL: string | null;
+  isAnonymous: boolean;
+  providerData: Array<{
+    providerId: string;
+    uid: string;
+    displayName: string | null;
+    email: string | null;
+    phoneNumber: string | null;
+    photoURL: string | null;
+  }>;
+}
+
+/**
+ * Error metadata interface
+ */
+export interface ErrorMetadata {
+  [key: string]: unknown;
+  docPath?: string;
+  retryCount?: number;
+  userId?: string;
+  component?: string;
+  function?: string;
 }
 
 /**
@@ -167,6 +203,52 @@ export function isLogEntry(obj: unknown): obj is LogEntry {
   );
 }
 
+export function isSearchResultItem(obj: unknown): obj is SearchResultItem {
+  if (typeof obj !== "object" || obj === null) return false;
+  const item = obj as SearchResultItem;
+  return (
+    typeof item.id === "string" &&
+    typeof item.name === "string" &&
+    (item.type === "user" || item.type === "log") &&
+    (item.description === undefined || typeof item.description === "string") &&
+    (item.tags === undefined || Array.isArray(item.tags))
+  );
+}
+
+export function isSearchResult(obj: unknown): obj is SearchResult {
+  if (typeof obj !== "object" || obj === null) return false;
+  const result = obj as SearchResult;
+  return (
+    Array.isArray(result.users) &&
+    Array.isArray(result.logs) &&
+    result.users.every(isSearchResultItem) &&
+    result.logs.every(isSearchResultItem)
+  );
+}
+
+export function isUser(obj: unknown): obj is User {
+  if (typeof obj !== "object" || obj === null) return false;
+  const user = obj as User;
+  return (
+    typeof user.uid === "string" &&
+    (user.displayName === null || typeof user.displayName === "string") &&
+    (user.email === null || typeof user.email === "string")
+  );
+}
+
+export function isErrorMetadata(obj: unknown): obj is ErrorMetadata {
+  if (typeof obj !== "object" || obj === null) return false;
+  const metadata = obj as ErrorMetadata;
+  return Object.keys(metadata).every(
+    (key) =>
+      key === "docPath" ||
+      key === "retryCount" ||
+      key === "userId" ||
+      key === "component" ||
+      key === "function"
+  );
+}
+
 /**
  * Runtime validation functions
  */
@@ -174,7 +256,11 @@ export function validateUserData(data: unknown): UserData | null {
   if (isUserData(data)) {
     return data;
   }
-  console.error("Invalid UserData:", data);
+  logError("Invalid UserData", new Error("Data validation failed"), {
+    component: "types",
+    function: "validateUserData",
+    metadata: { data: JSON.stringify(data) },
+  });
   return null;
 }
 
@@ -182,7 +268,11 @@ export function validateLogItem(data: unknown): LogItem | null {
   if (isLogItem(data)) {
     return data;
   }
-  console.error("Invalid LogItem:", data);
+  logError("Invalid LogItem", new Error("Data validation failed"), {
+    component: "types",
+    function: "validateLogItem",
+    metadata: { data: JSON.stringify(data) },
+  });
   return null;
 }
 
@@ -190,6 +280,60 @@ export function validateLogEntry(data: unknown): LogEntry | null {
   if (isLogEntry(data)) {
     return data;
   }
-  console.error("Invalid LogEntry:", data);
+  logError("Invalid LogEntry", new Error("Data validation failed"), {
+    component: "types",
+    function: "validateLogEntry",
+    metadata: { data: JSON.stringify(data) },
+  });
+  return null;
+}
+
+export function validateSearchResultItem(
+  data: unknown
+): SearchResultItem | null {
+  if (isSearchResultItem(data)) {
+    return data;
+  }
+  logError("Invalid SearchResultItem", new Error("Data validation failed"), {
+    component: "types",
+    function: "validateSearchResultItem",
+    metadata: { data: JSON.stringify(data) },
+  });
+  return null;
+}
+
+export function validateSearchResult(data: unknown): SearchResult | null {
+  if (isSearchResult(data)) {
+    return data;
+  }
+  logError("Invalid SearchResult", new Error("Data validation failed"), {
+    component: "types",
+    function: "validateSearchResult",
+    metadata: { data: JSON.stringify(data) },
+  });
+  return null;
+}
+
+export function validateUser(data: unknown): User | null {
+  if (isUser(data)) {
+    return data;
+  }
+  logError("Invalid User", new Error("Data validation failed"), {
+    component: "types",
+    function: "validateUser",
+    metadata: { data: JSON.stringify(data) },
+  });
+  return null;
+}
+
+export function validateErrorMetadata(data: unknown): ErrorMetadata | null {
+  if (isErrorMetadata(data)) {
+    return data;
+  }
+  logError("Invalid ErrorMetadata", new Error("Data validation failed"), {
+    component: "types",
+    function: "validateErrorMetadata",
+    metadata: { data: JSON.stringify(data) },
+  });
   return null;
 }
