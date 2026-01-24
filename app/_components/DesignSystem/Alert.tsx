@@ -15,20 +15,9 @@ export function Alert({
   onClose,
   className = "",
 }: AlertProps) {
-  // Base classes
-  const baseClasses = "p-4 rounded-md";
-
-  // Variant classes
-  const variantClasses = {
-    success: "bg-green-100 text-green-800 border border-green-200",
-    error: "bg-red-100 text-red-800 border border-red-200",
-    warning: "bg-yellow-100 text-yellow-800 border border-yellow-200",
-    info: "bg-blue-100 text-blue-800 border border-blue-200",
-  };
-
   return (
     <div
-      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+      className={`p-4 rounded-md bg-${variant}-100 text-${variant}-800 border border-${variant}-200 ${className}`}
       role="alert"
     >
       <div className="flex justify-between items-start">

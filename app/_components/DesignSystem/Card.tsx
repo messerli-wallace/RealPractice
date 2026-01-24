@@ -12,29 +12,17 @@ export function Card({
   children,
   ...props
 }: CardProps) {
-  // Base classes
-  const baseClasses = "rounded-lg bg-white";
-
-  // Variant classes
-  const variantClasses = {
-    default: "shadow-sm",
-    elevated: "shadow-md",
-    bordered: "border border-gray-200",
-  };
-
-  // Padding classes
-  const paddingClasses = {
-    none: "",
-    sm: "p-3",
-    md: "p-4",
-    lg: "p-6",
-  };
+  const classes = [
+    "card",
+    `card-${variant}`,
+    padding !== "none" ? `p-${padding}` : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div
-      className={`${baseClasses} ${variantClasses[variant]} ${paddingClasses[padding]} ${className}`}
-      {...props}
-    >
+    <div className={classes} {...props}>
       {children}
     </div>
   );
