@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -16,7 +18,8 @@ export function Input({
   className = "",
   ...props
 }: InputProps) {
-  const inputId = id || `input-${crypto.randomUUID()}`;
+  const generatedId = React.useId();
+  const inputId = id || `input-${generatedId}`;
 
   return (
     <div className={`input-group ${className}`}>
