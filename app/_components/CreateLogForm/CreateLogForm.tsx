@@ -187,7 +187,7 @@ export function CreateLogForm({
         </div>
       )}
 
-      <div className="form-grid grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <DateTimePickerField
           value={datetime}
           onChange={changeDatetime}
@@ -226,8 +226,8 @@ export function CreateLogForm({
         error={touchedFields.has("tags") ? errors.tags : undefined}
       />
 
-      <div className="form-actions mt-6">
-        <SubmitButton isLoading={isLoading} />
+      <div className="mt-8 flex justify-end">
+        <SubmitButton isLoading={isLoading} className="px-8 py-3 text-lg" />
       </div>
     </form>
   );

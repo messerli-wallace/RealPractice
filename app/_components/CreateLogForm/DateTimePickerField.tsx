@@ -13,12 +13,16 @@ export function DateTimePickerField({
 }: DateTimePickerProps) {
   return (
     <FormField label="Date and time:" error={error}>
-      <DateTimePicker
-        id="datetime-picker"
-        onChange={onChange}
-        value={value}
-        className={error ? "border-red-500" : ""}
-      />
+      <div
+        className={`border rounded-lg p-3 ${error ? "border-red-300 bg-red-50" : "border-gray-200"}`}
+      >
+        <DateTimePicker
+          id="datetime-picker"
+          onChange={onChange}
+          value={value}
+          className="w-full"
+        />
+      </div>
     </FormField>
   );
 }
