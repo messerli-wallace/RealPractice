@@ -13,6 +13,7 @@ import {
   validateLogEntry,
 } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
+import { compareDates } from "../../lib/utils/dateUtils";
 
 function getDb(): Firestore {
   if (!isConfigured || !db) {
@@ -61,8 +62,8 @@ export const subscribeToUserPosts = (
             }));
 
           // Sort by date (newest first)
-          organizedPosts.sort(
-            (a, b) => Number(b.dateTimeStr) - Number(a.dateTimeStr)
+          organizedPosts.sort((a, b) =>
+            compareDates(a.dateTimeStr, b.dateTimeStr)
           );
 
           onUpdate(organizedPosts);
@@ -176,8 +177,8 @@ export const subscribeToFriendsPosts = (
           }
 
           // Sort by date (newest first)
-          combinedPosts.sort(
-            (a, b) => Number(b.dateTimeStr) - Number(a.dateTimeStr)
+          combinedPosts.sort((a, b) =>
+            compareDates(a.dateTimeStr, b.dateTimeStr)
           );
 
           onUpdate(combinedPosts);

@@ -104,11 +104,11 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold mb-6">Search</h1>
+    <div className="container mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Search</h1>
 
-      <Card className="mb-6">
-        <div className="mb-4">
+      <Card className="mb-4 sm:mb-6">
+        <div className="mb-3 sm:mb-4">
           <div className="flex gap-2 mb-4">
             <Button
               variant={activeTab === "basic" ? "primary" : "secondary"}
@@ -127,7 +127,7 @@ const SearchPage: React.FC = () => {
           </div>
 
           {activeTab === "basic" ? (
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input
                 type="text"
                 placeholder="Search users, tags, or descriptions..."
@@ -145,7 +145,7 @@ const SearchPage: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4 sm:space-y-4">
               <Input
                 type="text"
                 placeholder="Search in descriptions and tags..."
@@ -180,12 +180,12 @@ const SearchPage: React.FC = () => {
                     {selectedTags.map((tag) => (
                       <span
                         key={tag}
-                        className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm"
                       >
                         {tag}
                         <button
                           onClick={() => removeTag(tag)}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-blue-600 hover:text-blue-800 text-sm"
                           aria-label={`Remove ${tag} tag`}
                         >
                           ×
@@ -196,7 +196,7 @@ const SearchPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   type="number"
                   placeholder="Min duration (minutes)"
@@ -226,14 +226,14 @@ const SearchPage: React.FC = () => {
         {activeTab === "basic" &&
           searchTerm.length > 0 &&
           searchTerm.length < 2 && (
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-xs sm:text-sm text-gray-500 mt-2">
               Enter at least 2 characters for better results
             </p>
           )}
       </Card>
 
       {error && (
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <Alert variant="error" title="Search Error">
             {error}
           </Alert>
@@ -241,7 +241,7 @@ const SearchPage: React.FC = () => {
       )}
 
       {searchResults && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Users Results */}
           <div>
             <h2 className="text-xl font-semibold mb-4">

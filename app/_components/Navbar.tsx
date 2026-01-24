@@ -42,12 +42,12 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="w-full px-3 sm:px-4 lg:px-8">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Left side - Logo and Navigation links */}
-          <div className="flex items-center space-x-1">
-            <div className="flex items-center space-x-2 pr-6">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+          <div className="flex items-center space-x-1 sm:space-x-2">
+            <div className="flex items-center space-x-2 pr-3 sm:pr-6">
+              <div className="w-7 sm:w-8 h-7 sm:h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
                 <svg
                   className="w-5 h-5 text-white"
                   fill="none"
@@ -62,26 +62,26 @@ const Navbar = () => {
                   />
                 </svg>
               </div>
-              <span className="font-bold text-lg text-gray-900">
+              <span className="font-bold text-base sm:text-lg text-gray-900">
                 RealPractice
               </span>
             </div>
             <Link
               href="/"
-              className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+              className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
             >
               Home
             </Link>
             <Link
               href="/home/search"
-              className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+              className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all hidden sm:block"
             >
               Search
             </Link>
             {user && (
               <Link
                 href="/home/profile"
-                className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all hidden sm:block"
               >
                 Profile
               </Link>
@@ -90,25 +90,25 @@ const Navbar = () => {
 
           {/* Right side - Auth buttons */}
           {!loading && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
               {!user ? (
                 <>
                   <button
                     onClick={handleSignIn}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
                   >
                     Login
                   </button>
                   <button
                     onClick={handleSignIn}
-                    className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg"
+                    className="px-4 sm:px-5 py-1.5 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg"
                   >
                     Sign Up
                   </button>
                 </>
               ) : (
                 <>
-                  <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200">
+                  <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200">
                     <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
                       <svg
                         className="w-3.5 h-3.5 text-white"
@@ -128,7 +128,7 @@ const Navbar = () => {
                   </div>
                   <button
                     onClick={logOut}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 rounded-lg transition-all"
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 rounded-lg transition-all"
                   >
                     Sign Out
                   </button>

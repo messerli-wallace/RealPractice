@@ -53,7 +53,9 @@ export interface DescriptionInputProps {
 
 export interface TagSelectorProps {
   value: string[];
+  otherTag: string;
   onChange: (tags: string[]) => void;
+  onOtherTagChange: (value: string) => void;
   onBlur?: () => void;
   error?: string;
 }

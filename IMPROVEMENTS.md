@@ -15,13 +15,13 @@
 
 **UI/UX**
 
-- Implement responsive design with mobile-first approach
+- ~~Implement responsive design with mobile-first approach~~ ✅
 - Add ARIA attributes, keyboard navigation, and screen reader support
 - Create consistent design system with spacing, typography, and visual feedback
 
 **Fixes**
 
-- Fix date/time handling for locale independence and timezone support
+- ~~Fix date/time handling for locale independence and timezone support~~ ✅
 - Fix sorting logic and add multiple sorting options
 - Add user profile customization and onboarding
 
