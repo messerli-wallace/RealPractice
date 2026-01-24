@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -15,7 +17,8 @@ export function Textarea({
   className = "",
   ...props
 }: TextareaProps) {
-  const textareaId = id || `textarea-${crypto.randomUUID()}`;
+  const generatedId = React.useId();
+  const textareaId = id || `textarea-${generatedId}`;
 
   return (
     <div className={`textarea-group ${className}`}>
