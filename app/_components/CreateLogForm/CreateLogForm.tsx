@@ -6,7 +6,7 @@ import {
   validateDescription,
   validateTags,
 } from "../../../lib/utils/validation";
-import { datetimeToString } from "../../../lib/utils/dateUtils";
+import { toString } from "../../../lib/utils/dateUtils";
 import { Alert } from "../DesignSystem";
 import {
   DateTimePickerField,
@@ -45,6 +45,7 @@ export function CreateLogForm({
     initialData.datetime
   );
   const [tags, setTags] = useState(initialData.tags);
+  const [otherTag, setOtherTag] = useState("");
   const [errors, setErrors] = useState<LogFormErrors>({});
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
@@ -52,16 +53,21 @@ export function CreateLogForm({
     e.preventDefault();
     setErrors({});
 
-    const dateTimeStr = datetimeToString(
+    const dateTimeStr = toString(
       Array.isArray(datetime)
         ? datetime[0] || new Date()
         : datetime || new Date()
     );
+
+    const processedTags = tags.map((tag) =>
+      tag === "other" && otherTag ? otherTag : tag
+    );
+
     const ticket: LogFormData = {
       dateTimeStr,
       duration,
       description,
-      tags,
+      tags: processedTags,
     };
 
     const validationResult = validateLogEntry(ticket);
@@ -85,6 +91,7 @@ export function CreateLogForm({
         setDescription("");
         setDuration("");
         setTags(["other"]);
+        setOtherTag("");
         changeDatetime(new Date());
       }
     } catch (error) {
@@ -176,7 +183,7 @@ export function CreateLogForm({
       className={`create-log-form ${className}`}
     >
       {errors.form && (
-        <div className="mb-4">
+        <div className="mb-3 sm:mb-4">
           <Alert
             variant={errors.success ? "success" : "error"}
             title={errors.success ? "Success" : "Error"}
@@ -187,7 +194,7 @@ export function CreateLogForm({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         <DateTimePickerField
           value={datetime}
           onChange={changeDatetime}
@@ -218,12 +225,14 @@ export function CreateLogForm({
 
       <TagSelector
         value={tags}
+        otherTag={otherTag}
         onChange={(value) => {
           setTags(value);
           validateField("tags", value);
         }}
         onBlur={() => handleBlur("tags")}
         error={touchedFields.has("tags") ? errors.tags : undefined}
+        onOtherTagChange={setOtherTag}
       />
 
       <div className="mt-8 flex justify-end">

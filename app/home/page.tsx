@@ -28,8 +28,8 @@ export default function Home() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-3xl font-bold mb-6">Home</h1>
+    <div className="container mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Home</h1>
 
       {error && (
         <div className="mb-4">
@@ -39,19 +39,21 @@ export default function Home() {
         </div>
       )}
 
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <CreateLog />
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-4">Recent Posts</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
+          Recent Posts
+        </h2>
 
         {loading && posts.length === 0 ? (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-6 sm:py-8">
             <LoadingGif />
           </div>
         ) : posts.length === 0 ? (
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-sm sm:text-base">
             No posts found. Create your first log!
           </p>
         ) : (
@@ -63,13 +65,13 @@ export default function Home() {
               </React.Fragment>
             ))}
             {loading && hasMore && (
-              <div className="flex justify-center py-4">
-                <p className="text-gray-500">Loading more posts...</p>
+              <div className="flex justify-center py-3 sm:py-4">
+                <p className="text-gray-500 text-sm">Loading more posts...</p>
               </div>
             )}
             {!hasMore && (
-              <div className="flex justify-center py-4">
-                <p className="text-gray-400 text-sm">
+              <div className="flex justify-center py-3 sm:py-4">
+                <p className="text-gray-400 text-xs sm:text-sm">
                   You&apos;ve reached the end!
                 </p>
               </div>
