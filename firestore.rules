@@ -8,14 +8,7 @@ service cloud.firestore {
       // --------------------------------------------
       // READ RULES
       // --------------------------------------------
-      // Allow users to read their own data
-      allow read: if (
-        request.auth != null && (
-          request.auth.uid == userId ||
-          // Allow reading public profile data for friends
-          (request.auth.uid != userId && isFriend(userId))
-        )
-      );
+      allow read: if request.auth != null;
 
       // --------------------------------------------
       // CREATE RULES
