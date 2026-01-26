@@ -1,7 +1,6 @@
 "use client";
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState } from "react";
 import CreateLog from "../_components/CreateLog";
-import LikeButton from "../_components/like-button";
 import Log from "../_components/log";
 import { useLogs } from "../context/LogsContext";
 import LoadingGif from "../_components/LoadingGif";
@@ -10,6 +9,7 @@ import { Alert } from "../_components/DesignSystem";
 export default function Home() {
   const { logs, loading, error, hasMore, loadMoreLogs } = useLogs();
   const observer = useRef<IntersectionObserver | null>(null);
+  const [showCreateLog, setShowCreateLog] = useState(false);
 
   const lastLogElementRef = useCallback(
     (node: HTMLDivElement) => {
@@ -40,7 +40,26 @@ export default function Home() {
       )}
 
       <div className="mb-6 sm:mb-8">
-        <CreateLog />
+        {!showCreateLog ? (
+          <button
+            onClick={() => setShowCreateLog(true)}
+            className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+          >
+            New Log
+          </button>
+        ) : (
+          <div className="overflow-hidden transition-all duration-500 ease-in-out">
+            <div className="flex justify-between items-center mb-4">
+              <button
+                onClick={() => setShowCreateLog(false)}
+                className="text-gray-600 hover:text-gray-800 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+            <CreateLog />
+          </div>
+        )}
       </div>
 
       <div>
@@ -60,7 +79,6 @@ export default function Home() {
           <div>
             {logs.map((log, index) => (
               <React.Fragment key={index}>
-                <LikeButton />
                 <Log log={{ ...log, index }} />
               </React.Fragment>
             ))}

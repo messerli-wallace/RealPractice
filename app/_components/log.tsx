@@ -1,4 +1,5 @@
 import React from "react";
+import LikeButton from "./like-button";
 
 interface LogProps {
   log: {
@@ -14,7 +15,10 @@ interface LogProps {
 export const Log: React.FC<LogProps> = ({ log }) => {
   return (
     <div className="log">
-      <h2 className="text-lg sm:text-xl font-semibold mb-2">Log</h2>
+      <div className="flex justify-between items-start mb-2">
+        <h2 className="text-lg sm:text-xl font-semibold">Log</h2>
+        <LikeButton logId={log.index?.toString()} />
+      </div>
       <p className="text-sm sm:text-base">
         <strong>Index:</strong> {log.index}
       </p>
