@@ -1,163 +1,81 @@
 "use client";
 
-import { useState } from "react";
-import DateTimePicker from "react-datetime-picker";
-import "react-datetime-picker/dist/DateTimePicker.css";
-import "react-calendar/dist/Calendar.css";
-import "react-clock/dist/Clock.css";
 import { UserAuth } from "../context/AuthContext";
 import { addLog } from "../_db/db";
-
-// Typescript declarations for the date-time component in the log form
-type ValuePiece = Date | null;
-type Value = ValuePiece | [ValuePiece, ValuePiece];
+import { logError, createComponentContext } from "../../lib/utils/errorLogger";
+import { LogItem } from "../../types/index";
+import { CreateLogForm } from "./CreateLogForm";
+import { LogFormData } from "./CreateLogForm/types";
 
 export default function CreateLog() {
-  // https://youtu.be/nSfu7sHPE9M?si=vBRp3uHl2pKxk0ZI
-  const [description, setDescription] = useState("");
-  const [duration, setDuration] = useState(""); // not implemented yet
-  const [datetime, changeDatetime] = useState<Value>(new Date());
-  const [isLoading, setLoading] = useState(false); // for when the form is submitted
-  const [tags, setTags] = useState(["other"]);
+  const errorContext = createComponentContext("CreateLog");
   const { user } = UserAuth();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // prevents refresh after submissions
-    setLoading(true); // stops user from inputting another log when current log is being processed
-
-    const dateTimeStr = datetimeToString(datetime);
-    const ticket = {
-      dateTimeStr,
-      duration,
-      description,
-      tags,
-    };
-    //try logging
+  const handleSubmit = async (data: LogFormData) => {
     try {
       if (user) {
         const logPath = user.uid;
-        await addLog(logPath, ticket); //writes the log ticket
+        const logItem: LogItem = {
+          id: crypto.randomUUID(),
+          ...data,
+          createdAt: Date.now().toString(),
+        };
+        await addLog(logPath, logItem);
       }
     } catch (error) {
-      console.error("Error writing data:", error);
-    }
-    setLoading(false);
-  };
-
-  const handleChangeDuration = (e) => {
-    // https://stackoverflow.com/questions/43067719/how-to-allow-only-numbers-in-textbox-in-reactjs#:~:text=Basic%20idea%20is%3A,value%20is%20a%20valid%20number.
-    const re = /^[0-9\b]+$/; //regex
-
-    //if the value isn't blank, check the input against the regex
-    if (e === "" || re.test(e)) {
-      setDuration(e);
+      if (error instanceof Error) {
+        logError(
+          "Failed to submit practice log",
+          error,
+          errorContext.withUser(user)
+        );
+      }
+      throw error;
     }
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl">New Log</h1>
-      {user ? (
-        <form
-          onSubmit={handleSubmit}
-          id="createLog"
-          className="w-screen flex border border-solid border-grey"
-        >
-          <label htmlFor="datetime-picker">
-            <span>Date and time:</span>
-            <DateTimePicker
-              id="datetime-picker"
-              onChange={changeDatetime}
-              value={datetime}
-            />
-          </label>
-          <label>
-            <span>Duration (minutes):</span>
-            <textarea
-              className="border border-solid border-grey"
-              required
-              onChange={(e) => handleChangeDuration(e.target.value)}
-              value={duration}
-              cols={4}
-            />
-          </label>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+          <div className="px-6 py-8 sm:p-10">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                New Practice Log
+              </h1>
+              <p className="text-gray-600">Record your practice session</p>
+            </div>
 
-          <label>
-            <span>Description:</span>
-            <textarea
-              className="border border-solid border-grey"
-              required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              cols={60}
-            />
-          </label>
-          <label>
-            <span>Tags:</span>
-            <select
-              // https://react.dev/reference/react-dom/components/select
-              className="border border-solid border-grey"
-              multiple={true}
-              value={tags}
-              onChange={(e) => {
-                const options = [...e.target.selectedOptions];
-                const values = options.map((option) => option.value);
-                setTags(values);
-              }}
-            >
-              <option value="music">Music</option>
-              <option value="piano">Piano</option>
-              <option value="meditation">Meditation</option>
-              <option value="studying">Studying</option>
-              <option value="other">Other</option>
-            </select>
-          </label>
-
-          <button
-            className="p-4 border border-solid border-grey"
-            disabled={isLoading}
-            type="submit"
-          >
-            {isLoading && <span>Adding to log!</span>}
-            {!isLoading && <span>Submit</span>}
-          </button>
-        </form>
-      ) : (
-        <div className="p-4">You must be logged in to add a log.</div>
-      )}
+            {user ? (
+              <CreateLogForm onSubmit={handleSubmit} className="space-y-6" />
+            ) : (
+              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg
+                      className="h-5 w-5 text-yellow-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.21 3.03-1.742 3.03H4.42c-1.532 0-2.493-1.696-1.742-3.03l5.58-9.92zM10 13a1 1 0 110-2 1 1 0 010 2zm-1-4a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-yellow-700">
+                      You must be logged in to add a log.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
-function datetimeToString(datetime) {
-  /* 
-    returns a date-time object to a string in the format {MM}-{DD}-{YYYY}-{HH}-{MM}-GMT-{N} 
-    */
-  //Specify the options for the output format
-  const options = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "shortOffset",
-    hour12: false,
-  } as Intl.DateTimeFormatOptions;
-  const str_date = datetime?.toLocaleString([], options);
-  const arrDT = str_date?.split(/[\s:,/]+/); //split on all the separating characters
-  // format ['MM', 'DD', 'YYYY', 'HH', 'MM', 'GMT-6']
-  const outDT = arrDT?.join("-");
-  return outDT;
-}
-
-// Define the interfaces for the tag option object, needed in TypeScript implementation that currently isn't being used
-// interface Option {
-//     value: string;
-//     label: string;
-//   }
-// const tagOptions: Option[] = [
-// { value: "music", label: "Music" },
-// { value: "meditation", label: "Meditation" },
-// { value: "studying", label: "Studying" },
-// { value: "other", label: "Other"},
-// ];
