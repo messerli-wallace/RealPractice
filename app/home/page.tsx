@@ -2,12 +2,27 @@
 import React, { useRef, useCallback, useState } from "react";
 import CreateLog from "../_components/CreateLog";
 import Log from "../_components/log";
+import { FilterBar } from "../_components/FilterBar";
 import { useLogs } from "../context/LogsContext";
 import LoadingGif from "../_components/LoadingGif";
 import { Alert } from "../_components/DesignSystem";
 
 export default function Home() {
-  const { logs, loading, error, hasMore, loadMoreLogs } = useLogs();
+  const {
+    logs,
+    loading,
+    error,
+    hasMore,
+    loadMoreLogs,
+    tagFilter,
+    setTagFilter,
+    userFilter,
+    setUserFilter,
+    showOnlyMine,
+    setShowOnlyMine,
+    clearFilters,
+    initialUserId,
+  } = useLogs();
   const observer = useRef<IntersectionObserver | null>(null);
   const [showCreateLog, setShowCreateLog] = useState(false);
 
@@ -61,6 +76,18 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      <FilterBar
+        tagFilter={tagFilter}
+        setTagFilter={setTagFilter}
+        userFilter={userFilter}
+        setUserFilter={setUserFilter}
+        showOnlyMine={showOnlyMine}
+        setShowOnlyMine={setShowOnlyMine}
+        currentUserName={initialUserId}
+        hasActiveFilters={!!tagFilter || !!userFilter || showOnlyMine}
+        clearFilters={clearFilters}
+      />
 
       <div>
         <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
