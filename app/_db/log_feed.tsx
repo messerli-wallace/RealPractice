@@ -109,10 +109,13 @@ const queryUserByName = async (
 
     return targetAccounts.docs.map((doc: DocumentSnapshot) => {
       const data = doc.data();
-      if (data && data.logs) {
-        return { [doc.id]: data.logs.slice(0, 10) };
-      } else {
+      if (!data) {
         return { [doc.id]: [] };
+      }
+      if (data.logs) {
+        return { [data.name || doc.id]: data.logs.slice(0, 10) };
+      } else {
+        return { [data.name || doc.id]: [] };
       }
     });
   } catch (error) {
