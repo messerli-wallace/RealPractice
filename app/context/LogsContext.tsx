@@ -6,6 +6,7 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
 import { getRecentLogs } from "../_db/log_feed";
 import { subscribeToFriendsLogs } from "../_db/realtimeService";
@@ -22,6 +23,7 @@ interface Log {
 
 interface LogsContextType {
   logs: Log[];
+  allLogs: Log[];
   loading: boolean;
   error: Error | null;
   hasMore: boolean;
@@ -29,6 +31,14 @@ interface LogsContextType {
   refreshLogs: () => Promise<void>;
   addLog: (log: Log) => void;
   loadMoreLogs: () => Promise<void>;
+  tagFilter: string;
+  setTagFilter: (value: string) => void;
+  userFilter: string;
+  setUserFilter: (value: string) => void;
+  showOnlyMine: boolean;
+  setShowOnlyMine: (value: boolean) => void;
+  clearFilters: () => void;
+  initialUserId: string;
 }
 
 const LogsContext = createContext<LogsContextType | undefined>(undefined);
@@ -44,12 +54,57 @@ export const LogsContextProvider = ({
   initialUserId = "Jack M",
   enableRealtime = true,
 }: LogsContextProviderProps) => {
+  const [allLogs, setAllLogs] = useState<Log[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [_pageSize] = useState(10);
+  const [tagFilter, setTagFilter] = useState("");
+  const [userFilter, setUserFilter] = useState("");
+  const [showOnlyMine, setShowOnlyMine] = useState(false);
+
+  const clearFilters = () => {
+    setTagFilter("");
+    setUserFilter("");
+    setShowOnlyMine(false);
+  };
+
+  const filterLogs = useCallback(() => {
+    const filteredLogs = allLogs.filter((log) => {
+      const matchesTagFilter = tagFilter
+        ? tagFilter
+            .split(",")
+            .map((tag) => tag.trim().toLowerCase())
+            .some((tag) =>
+              log.tags.some((logTag) => logTag.toLowerCase().includes(tag))
+            )
+        : true;
+
+      const matchesUserFilter = userFilter
+        ? log.user.toLowerCase().includes(userFilter.toLowerCase())
+        : true;
+
+      const matchesShowOnlyMine = showOnlyMine
+        ? log.user === initialUserId
+        : true;
+
+      return matchesTagFilter && matchesUserFilter && matchesShowOnlyMine;
+    });
+
+    const paginatedFilteredLogs = filteredLogs.slice(0, page * _pageSize);
+    setLogs(paginatedFilteredLogs);
+    setHasMore(filteredLogs.length > paginatedFilteredLogs.length);
+  }, [
+    allLogs,
+    tagFilter,
+    userFilter,
+    showOnlyMine,
+    initialUserId,
+    page,
+    _pageSize,
+  ]);
 
   const fetchLogs = async (pageNum: number = 1, append: boolean = false) => {
     try {
@@ -57,7 +112,12 @@ export const LogsContextProvider = ({
       setError(null);
       const recentLogs = await getRecentLogs(initialUserId);
 
-      // Simulate pagination - in a real app, this would come from the API
+      setAllLogs(recentLogs);
+
+      if (append) {
+        setAllLogs((prevLogs) => [...prevLogs, ...recentLogs]);
+      }
+
       const startIndex = (pageNum - 1) * _pageSize;
       const endIndex = startIndex + _pageSize;
       const paginatedLogs = recentLogs.slice(startIndex, endIndex);
@@ -68,7 +128,6 @@ export const LogsContextProvider = ({
         setLogs(paginatedLogs);
       }
 
-      // Check if there are more logs to load
       setHasMore(endIndex < recentLogs.length);
       setPage(pageNum);
     } catch (err) {
@@ -140,18 +199,18 @@ export const LogsContextProvider = ({
   };
 
   const addLog = (log: Log) => {
-    setLogs((prevLogs) => [log, ...prevLogs]);
+    setAllLogs((prevLogs) => [log, ...prevLogs]);
   };
 
   useEffect(() => {
-    fetchLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialUserId]);
+    filterLogs();
+  }, [filterLogs]);
 
   return (
     <LogsContext.Provider
       value={{
         logs,
+        allLogs,
         loading,
         error,
         hasMore,
@@ -159,6 +218,14 @@ export const LogsContextProvider = ({
         refreshLogs,
         addLog,
         loadMoreLogs,
+        tagFilter,
+        setTagFilter,
+        userFilter,
+        setUserFilter,
+        showOnlyMine,
+        setShowOnlyMine,
+        clearFilters,
+        initialUserId,
       }}
     >
       {children}

@@ -1,9 +1,9 @@
 **Features**
 
-- Filter on logs. Should have filter on tags, filter on users (by name) and a box that makes it so the user only sees their posts.
+- ~~Filter on logs. Should have filter on tags, filter on users (by name) and a box that makes it so the user only sees their posts.~~ (COMPLETED)
 - In each log, the user's name should be displayed instead of user id
 - ~~The like button should be changed from a bool to an actual like button, and moved inside the log component.~~ (COMPLETED)
-- the new log component should be hidden until the user presses the "new log" button, then it should appear smoothly.
+- ~~the new log component should be hidden until the user presses the "new log" button, then it should appear smoothly.~~ (COMPLETED)
 
 **Build & Config**
 
