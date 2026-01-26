@@ -7,11 +7,12 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { getRecentPosts } from "../_db/post_feed.tsx";
-import { subscribeToFriendsPosts } from "../_db/realtimeService";
+import { getRecentLogs } from "../_db/log_feed";
+import { subscribeToFriendsLogs } from "../_db/realtimeService";
+import { OrganizedLogEntry } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
 
-interface Post {
+interface Log {
   user: string;
   dateTimeStr: string;
   duration: string;
@@ -19,62 +20,62 @@ interface Post {
   description: string | null;
 }
 
-interface PostsContextType {
-  posts: Post[];
+interface LogsContextType {
+  logs: Log[];
   loading: boolean;
   error: Error | null;
   hasMore: boolean;
   page: number;
-  refreshPosts: () => Promise<void>;
-  addPost: (post: Post) => void;
-  loadMorePosts: () => Promise<void>;
+  refreshLogs: () => Promise<void>;
+  addLog: (log: Log) => void;
+  loadMoreLogs: () => Promise<void>;
 }
 
-const PostsContext = createContext<PostsContextType | undefined>(undefined);
+const LogsContext = createContext<LogsContextType | undefined>(undefined);
 
-interface PostsContextProviderProps {
+interface LogsContextProviderProps {
   children: ReactNode;
   initialUserId?: string;
   enableRealtime?: boolean;
 }
 
-export const PostsContextProvider = ({
+export const LogsContextProvider = ({
   children,
   initialUserId = "Jack M",
   enableRealtime = true,
-}: PostsContextProviderProps) => {
-  const [posts, setPosts] = useState<Post[]>([]);
+}: LogsContextProviderProps) => {
+  const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [_pageSize] = useState(10);
 
-  const fetchPosts = async (pageNum: number = 1, append: boolean = false) => {
+  const fetchLogs = async (pageNum: number = 1, append: boolean = false) => {
     try {
       setLoading(true);
       setError(null);
-      const recentPosts = await getRecentPosts(initialUserId);
+      const recentLogs = await getRecentLogs(initialUserId);
 
       // Simulate pagination - in a real app, this would come from the API
       const startIndex = (pageNum - 1) * _pageSize;
       const endIndex = startIndex + _pageSize;
-      const paginatedPosts = recentPosts.slice(startIndex, endIndex);
+      const paginatedLogs = recentLogs.slice(startIndex, endIndex);
 
       if (append) {
-        setPosts((prevPosts) => [...prevPosts, ...paginatedPosts]);
+        setLogs((prevLogs) => [...prevLogs, ...paginatedLogs]);
       } else {
-        setPosts(paginatedPosts);
+        setLogs(paginatedLogs);
       }
 
-      // Check if there are more posts to load
-      setHasMore(endIndex < recentPosts.length);
+      // Check if there are more logs to load
+      setHasMore(endIndex < recentLogs.length);
       setPage(pageNum);
     } catch (err) {
       if (err instanceof Error) {
-        logError("Error fetching posts", err, {
-          component: "PostsContext",
-          function: "fetchPosts",
+        logError("Error fetching logs", err, {
+          component: "LogsContext",
+          function: "fetchLogs",
         });
         setError(err);
       }
@@ -91,21 +92,21 @@ export const PostsContextProvider = ({
 
     const setupRealtimeSubscription = async () => {
       try {
-        unsubscribe = subscribeToFriendsPosts(
+        unsubscribe = subscribeToFriendsLogs(
           initialUserId,
-          (updatedPosts) => {
+          (updatedLogs: OrganizedLogEntry[]) => {
             // Convert to pagination format
             const startIndex = 0;
             const endIndex = _pageSize;
-            const paginatedPosts = updatedPosts.slice(startIndex, endIndex);
+            const paginatedLogs = updatedLogs.slice(startIndex, endIndex);
 
-            setPosts(paginatedPosts);
-            setHasMore(endIndex < updatedPosts.length);
+            setLogs(paginatedLogs);
+            setHasMore(endIndex < updatedLogs.length);
             setPage(1);
           },
-          (error) => {
+          (error: Error) => {
             logError("Realtime subscription error", error, {
-              component: "PostsContext",
+              component: "LogsContext",
               function: "realtimeSubscription",
             });
             setError(error);
@@ -114,7 +115,7 @@ export const PostsContextProvider = ({
       } catch (error) {
         if (error instanceof Error) {
           logError("Failed to set up realtime subscription", error, {
-            component: "PostsContext",
+            component: "LogsContext",
             function: "setupRealtimeSubscription",
           });
           setError(error);
@@ -129,46 +130,46 @@ export const PostsContextProvider = ({
     };
   }, [initialUserId, enableRealtime, _pageSize]);
 
-  const refreshPosts = async () => {
-    await fetchPosts(1, false);
+  const refreshLogs = async () => {
+    await fetchLogs(1, false);
   };
 
-  const loadMorePosts = async () => {
+  const loadMoreLogs = async () => {
     if (loading || !hasMore) return;
-    await fetchPosts(page + 1, true);
+    await fetchLogs(page + 1, true);
   };
 
-  const addPost = (post: Post) => {
-    setPosts((prevPosts) => [post, ...prevPosts]);
+  const addLog = (log: Log) => {
+    setLogs((prevLogs) => [log, ...prevLogs]);
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchLogs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialUserId]);
 
   return (
-    <PostsContext.Provider
+    <LogsContext.Provider
       value={{
-        posts,
+        logs,
         loading,
         error,
         hasMore,
         page,
-        refreshPosts,
-        addPost,
-        loadMorePosts,
+        refreshLogs,
+        addLog,
+        loadMoreLogs,
       }}
     >
       {children}
-    </PostsContext.Provider>
+    </LogsContext.Provider>
   );
 };
 
-export const usePosts = (): PostsContextType => {
-  const context = useContext(PostsContext);
+export const useLogs = (): LogsContextType => {
+  const context = useContext(LogsContext);
   if (context === undefined) {
-    throw new Error("usePosts must be used within a PostsProvider");
+    throw new Error("useLogs must be used within a LogsProvider");
   }
   return context;
 };

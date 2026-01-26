@@ -2,7 +2,7 @@
 import Navbar from "../_components/Navbar";
 import {
   AuthContextProvider,
-  PostsContextProvider,
+  LogsContextProvider,
   UIContextProvider,
 } from "../context";
 import { ErrorBoundary } from "../_components/ErrorBoundary";
@@ -15,12 +15,12 @@ export default function HomeLayout({
   return (
     <AuthContextProvider>
       <UIContextProvider>
-        <PostsContextProvider>
+        <LogsContextProvider>
           <ErrorBoundary>
             <Navbar />
             {children}
           </ErrorBoundary>
-        </PostsContextProvider>
+        </LogsContextProvider>
       </UIContextProvider>
     </AuthContextProvider>
   );

@@ -1,7 +1,7 @@
 import React from "react";
 
-interface PostProps {
-  post: {
+interface LogProps {
+  log: {
     user: string;
     dateTimeStr: string;
     duration: string;
@@ -11,25 +11,25 @@ interface PostProps {
   };
 }
 
-export const Post: React.FC<PostProps> = ({ post }) => {
+export const Log: React.FC<LogProps> = ({ log }) => {
   return (
-    <div className="post">
-      <h2 className="text-lg sm:text-xl font-semibold mb-2">Post</h2>
+    <div className="log">
+      <h2 className="text-lg sm:text-xl font-semibold mb-2">Log</h2>
       <p className="text-sm sm:text-base">
-        <strong>Index:</strong> {post.index}
+        <strong>Index:</strong> {log.index}
       </p>
       <p className="text-sm sm:text-base">
-        <strong>User:</strong> {post.user}
+        <strong>User:</strong> {log.user}
       </p>
       <p className="text-sm sm:text-base">
-        <strong>Date:</strong> {post.dateTimeStr}
+        <strong>Date:</strong> {log.dateTimeStr}
       </p>
       <p className="text-sm sm:text-base">
-        <strong>Duration:</strong> {post.duration}
+        <strong>Duration:</strong> {log.duration}
       </p>
       <p className="text-sm sm:text-base flex flex-wrap gap-1">
         <strong>Tags:</strong>{" "}
-        {post.tags.map((tag, idx) => (
+        {log.tags.map((tag, idx) => (
           <span
             key={idx}
             className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs sm:text-sm"
@@ -40,10 +40,10 @@ export const Post: React.FC<PostProps> = ({ post }) => {
       </p>
       <p className="text-sm sm:text-base mt-2 break-words">
         <strong>Description:</strong>{" "}
-        {post.description || "No description available"}
+        {log.description || "No description available"}
       </p>
     </div>
   );
 };
 
-export default Post;
+export default Log;

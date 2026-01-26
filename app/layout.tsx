@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import {
   AuthContextProvider,
-  PostsContextProvider,
+  LogsContextProvider,
   UIContextProvider,
 } from "./context";
 import { ErrorBoundary } from "./_components/ErrorBoundary";
@@ -27,9 +27,9 @@ export default function RootLayout({
       <body>
         <AuthContextProvider>
           <UIContextProvider>
-            <PostsContextProvider>
+            <LogsContextProvider>
               <ErrorBoundary>{children}</ErrorBoundary>
-            </PostsContextProvider>
+            </LogsContextProvider>
           </UIContextProvider>
         </AuthContextProvider>
       </body>

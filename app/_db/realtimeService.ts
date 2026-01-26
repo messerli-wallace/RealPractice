@@ -25,11 +25,11 @@ function getDb(): Firestore {
 }
 
 /**
- * Subscribe to real-time updates for a user's posts
+ * Subscribe to real-time updates for a user's logs
  */
-export const subscribeToUserPosts = (
+export const subscribeToUserLogs = (
   userId: string,
-  onUpdate: (posts: OrganizedLogEntry[]) => void,
+  onUpdate: (logs: OrganizedLogEntry[]) => void,
   onError: (error: Error) => void
 ): Unsubscribe => {
   if (!isConfigured) {
@@ -51,7 +51,7 @@ export const subscribeToUserPosts = (
           const logs = userData.logs || [];
 
           // Convert logs to organized format
-          const organizedPosts: OrganizedLogEntry[] = logs
+          const organizedLogs: OrganizedLogEntry[] = logs
             .filter((log) => validateLogEntry(log))
             .map((log) => ({
               user: userData.name || userId,
@@ -62,19 +62,19 @@ export const subscribeToUserPosts = (
             }));
 
           // Sort by date (newest first)
-          organizedPosts.sort((a, b) =>
+          organizedLogs.sort((a, b) =>
             compareDates(a.dateTimeStr, b.dateTimeStr)
           );
 
-          onUpdate(organizedPosts);
+          onUpdate(organizedLogs);
         } else {
           onUpdate([]);
         }
       } catch (error) {
         if (error instanceof Error) {
-          logError("Error processing user posts update", error, {
+          logError("Error processing user logs update", error, {
             component: "realtimeService",
-            function: "subscribeToUserPosts",
+            function: "subscribeToUserLogs",
             metadata: { userId },
           });
           onError(error);
@@ -83,9 +83,9 @@ export const subscribeToUserPosts = (
     },
     (error) => {
       if (error instanceof Error) {
-        logError("Error in user posts subscription", error, {
+        logError("Error in user logs subscription", error, {
           component: "realtimeService",
-          function: "subscribeToUserPosts",
+          function: "subscribeToUserLogs",
           metadata: { userId },
         });
         onError(error);
@@ -97,9 +97,9 @@ export const subscribeToUserPosts = (
 /**
  * Subscribe to real-time updates for multiple users (friends feed)
  */
-export const subscribeToFriendsPosts = (
+export const subscribeToFriendsLogs = (
   userId: string,
-  onUpdate: (posts: OrganizedLogEntry[]) => void,
+  onUpdate: (logs: OrganizedLogEntry[]) => void,
   onError: (error: Error) => void
 ): Unsubscribe => {
   if (!isConfigured) {
@@ -133,13 +133,13 @@ export const subscribeToFriendsPosts = (
 
       // Subscribe to each user
       for (const friendId of allUserIds) {
-        const unsubscribe = subscribeToUserPosts(
+        const unsubscribe = subscribeToUserLogs(
           friendId,
           () => {
-            // When we get updates from any user, combine all posts
+            // When we get updates from any user, combine all logs
             // This is a simple approach - in production, you might want
             // to optimize this to avoid recomputing the entire list
-            combineAndUpdatePosts();
+            combineAndUpdateLogs();
           },
           onError
         );
@@ -147,12 +147,12 @@ export const subscribeToFriendsPosts = (
       }
 
       // Initial combine
-      await combineAndUpdatePosts();
+      await combineAndUpdateLogs();
 
-      async function combineAndUpdatePosts() {
+      async function combineAndUpdateLogs() {
         try {
-          // Get all posts from all users
-          const combinedPosts: OrganizedLogEntry[] = [];
+          // Get all logs from all users
+          const combinedLogs: OrganizedLogEntry[] = [];
 
           for (const friendId of allUserIds) {
             const userDocRef = doc(db, "users", friendId);
@@ -162,7 +162,7 @@ export const subscribeToFriendsPosts = (
               const userData = userDoc.data() as UserData;
               const logs = userData.logs || [];
 
-              const userPosts = logs
+              const userLogs = logs
                 .filter((log) => validateLogEntry(log))
                 .map((log) => ({
                   user: userData.name || friendId,
@@ -172,21 +172,21 @@ export const subscribeToFriendsPosts = (
                   description: log.description || null,
                 }));
 
-              combinedPosts.push(...userPosts);
+              combinedLogs.push(...userLogs);
             }
           }
 
           // Sort by date (newest first)
-          combinedPosts.sort((a, b) =>
+          combinedLogs.sort((a, b) =>
             compareDates(a.dateTimeStr, b.dateTimeStr)
           );
 
-          onUpdate(combinedPosts);
+          onUpdate(combinedLogs);
         } catch (error) {
           if (error instanceof Error) {
-            logError("Error combining friends posts", error, {
+            logError("Error combining friends logs", error, {
               component: "realtimeService",
-              function: "subscribeToFriendsPosts",
+              function: "subscribeToFriendsLogs",
               metadata: { userId },
             });
             onError(error);
@@ -195,9 +195,9 @@ export const subscribeToFriendsPosts = (
       }
     } catch (error) {
       if (error instanceof Error) {
-        logError("Error setting up friends posts subscription", error, {
+        logError("Error setting up friends logs subscription", error, {
           component: "realtimeService",
-          function: "subscribeToFriendsPosts",
+          function: "subscribeToFriendsLogs",
           metadata: { userId },
         });
         onError(error);
