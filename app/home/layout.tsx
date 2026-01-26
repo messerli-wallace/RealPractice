@@ -1,22 +1,27 @@
-"use client"; // CHECK THIS AT SOME POINT: hypothetically, all 'home' components are client, but I've seen arguing against.
-import "../globals.css";
+"use client";
 import Navbar from "../_components/Navbar";
-import { AuthContextProvider } from "../context/AuthContext";
+import {
+  AuthContextProvider,
+  LogsContextProvider,
+  UIContextProvider,
+} from "../context";
+import { ErrorBoundary } from "../_components/ErrorBoundary";
 
-export default function RootLayout({
+export default function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      {/* This is where shared UI would go, like header or sidebar */}
-      <body>
-        <AuthContextProvider>
-          <Navbar />
-          {children}
-        </AuthContextProvider>
-      </body>
-    </html>
+    <AuthContextProvider>
+      <UIContextProvider>
+        <LogsContextProvider>
+          <ErrorBoundary>
+            <Navbar />
+            {children}
+          </ErrorBoundary>
+        </LogsContextProvider>
+      </UIContextProvider>
+    </AuthContextProvider>
   );
 }

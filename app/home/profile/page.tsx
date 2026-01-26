@@ -15,17 +15,19 @@ const ProfilePage = () => {
   }, [user]);
 
   return (
-    <div className="p-4">
+    <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       {loading ? (
         <LoadingImage />
       ) : user ? (
         // user info
         <div>
-          <p>Welcome, {user.displayName}</p>
+          <p className="text-base sm:text-lg">Welcome, {user.displayName}</p>
         </div>
       ) : (
-        <div className="p-4">
-          You must be logged in to view this page - protected route.
+        <div className="px-4 py-6 sm:py-8">
+          <p className="text-sm sm:text-base">
+            You must be logged in to view this page - protected route.
+          </p>
         </div>
       )}
     </div>

@@ -1,15 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/home",
-        permanent: true,
-      },
-    ];
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
   },
+  // Note: redirects don't work with static export
 };
 
 export default nextConfig;

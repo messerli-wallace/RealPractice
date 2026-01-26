@@ -1,102 +1,159 @@
-# Agent Guidelines
+# AGENTS.md - RealPractice Development Guide
+
+This document provides guidelines for agentic coding agents working on the RealPractice codebase.
 
 ## Project Overview
 
-**RealPractice** is a social time-based practice logging application built with Next.js and Firebase. The app allows users to track and log their practice sessions (musical instruments, meditation, studying, etc.) with detailed analytics, social features, and community interaction.
+RealPractice is a Next.js + Firebase social app for logging and tracking time-based practice (musical instruments, meditation, studying, etc.). Practice sessions are logged with title, description, tags, and duration. Users can follow others and interact through likes/comments.
 
-### Key Features
-- **Practice Logging**: Track practice sessions with duration, descriptions, and tags
-- **User Profiles**: View practice analytics and statistics over time
-- **Social Features**: Follow other users, like and comment on practice logs
-- **Search Functionality**: Find users and practice logs
-- **Real-time Updates**: Firebase-powered live data synchronization
+## Build, Lint, and Test Commands
 
-## Architecture
+```bash
+# Development
+npm run dev                    # Start Next.js dev server
 
-### Technology Stack
-- **Frontend**: Next.js 14 with React functional components and hooks
-- **Database**: Firebase Firestore (NoSQL document database)
-- **Authentication**: Firebase Authentication with Google Auth Provider
-- **Styling**: Tailwind CSS for utility-first styling
-- **State Management**: React Context API for authentication state
+# Build
+npm run build                  # Production build
+npm run build:firebase         # Build for Firebase deployment
+npm run deploy:firebase        # Build and deploy to Firebase
 
-### Component Structure
-- **Core Components**: `Navbar`, `post`, `like-button`, `CreateLog`, `LoadingGif`
-- **Database Layer**: `app/_db/db.ts` with Firebase CRUD operations
-- **Authentication**: `app/context/AuthContext.tsx` for user session management
-- **Firebase Integration**: `app/firebase.tsx` for Firebase initialization
+# Linting
+npm run lint                   # Run ESLint on all .ts/.tsx files
+npm run lint:fix               # Run ESLint with auto-fix
+npm run format                 # Format all files with Prettier
 
-### Data Flow
-1. **User Authentication**: Firebase Auth → AuthContext → Protected routes
-2. **Data Operations**: UI Components → Database functions → Firestore
-3. **Real-time Updates**: Firestore listeners → React state updates
+# Type Checking
+npm run check-types            # Run TypeScript type check (noEmit)
 
-## Commands
+# Testing
+npm run test                   # Run all Jest tests
+npm run test:watch             # Run Jest in watch mode
+npm run test:coverage          # Run tests with coverage report
 
-- **Build**: `npm run build`
-- **Dev server**: `npm run dev`
-- **Start production**: `npm run start`
-- **Lint**: `npx eslint .` (runs via pre-commit hook with --fix)
-- **Format**: `npx prettier --write .` (runs via pre-commit hook)
-- **Type check**: `npx tsc --noEmit`
-- **Test**: No tests configured yet
+# To run a single test file, use Jest's pattern matching:
+npm test -- --testPathPattern="filename.test.ts"
+npm test -- filename.test.ts   # Shorthand for single file
+```
 
-## Code Style
+## Code Style Guidelines
 
-- **TypeScript**: strictNullChecks enabled, strict mode disabled
-- **React**: Functional components with hooks, no prop-types
-- **Imports**: Named imports preferred, destructure from React
-- **Naming**: PascalCase for components, camelCase for functions/variables
-- **Types**: Explicit interfaces for props, data structures, context
-- **Formatting**: Prettier (semicolons, double quotes, 2-space indent, 80 char width)
-- **Linting**: ESLint with TypeScript, React, React Hooks, JSX a11y rules
-- **Styling**: Tailwind CSS classes in JSX
-- **Error handling**: try/catch with console.log, throw Error for context issues
-- **Comments**: Minimal, no inline comments unless complex logic
+### Formatting (Prettier)
 
-## Firebase Configuration
+- Line width: 80 characters
+- Tab width: 2 spaces
+- Semicolons: required
+- Single quotes: disabled (use double quotes)
+- Trailing commas: ES5 compatible
+- Bracket spacing: enabled
+- Arrow function parens: always
 
-### Security Rules
-The project uses Firebase Firestore security rules defined in `firebase.rules`:
-- **Read Access**: Public read access for all user documents (adjust for production)
-- **Write Access**: Authenticated users can only write to their own documents
+Run `npm run format` to auto-format the codebase.
 
-### Services Used
-- **Firestore Database**: Stores user data, practice logs, and social connections
-- **Firebase Authentication**: Handles user sign-in/sign-up with Google provider
-- **Firebase App**: Core Firebase initialization and configuration
+### Linting (ESLint)
 
-## Testing Strategy
+- Extends: TypeScript-ESLint recommended, React, React-Hooks, JSX-A11y, Prettier
+- JSX: React 16+ with automatic version detection
+- Module system: ES Modules
 
-Currently, the project has no formal testing setup. Recommended testing approach:
+Key rules:
 
-### Unit Testing
-- **Framework**: Jest with React Testing Library
-- **Coverage**: Component rendering, user interactions, utility functions
-- **Mocking**: Firebase services using `@firebase/rules-unit-testing`
+- `no-explicit-any`: warning (avoid `any`, use `unknown` or proper types)
+- `no-unused-vars`: warning (prefix unused params with `_`)
+- `react/react-in-jsx-scope`: off (JSX transform handles this)
+- `react/prop-types`: off (TypeScript handles this)
 
-### Integration Testing
-- **Authentication Flow**: Sign-in/sign-out processes
-- **Database Operations**: CRUD operations validation
-- **Real-time Updates**: Firestore listener testing
+### TypeScript Configuration
 
-### End-to-End Testing
-- **Framework**: Cypress or Playwright
-- **Scenarios**: User registration, practice logging, social interactions
+- Target: ES6
+- Strict mode enabled with all strict flags
+- Module: ESNext with extension imports
+- JSX: preserve (Next.js handles transformation)
+- Path alias: `@/` maps to root directory
 
-## Development Workflow
+Import path style: `import X from "@/path"` not relative paths like `../../path`.
 
-1. **Environment Setup**: Copy `.env.example` to `.env.local` and add Firebase credentials
-2. **Feature Development**: Implement components with TypeScript interfaces
-3. **Database Operations**: Use the database utility functions in `app/_db/db.ts`
-4. **Styling**: Apply Tailwind CSS classes directly in JSX
-5. **Code Quality**: Pre-commit hooks run ESLint and Prettier automatically
-6. **Type Checking**: Run `npx tsc --noEmit` to verify TypeScript types
+### Naming Conventions
 
-## Production Considerations
+- **Components**: PascalCase (e.g., `CreateLog`, `DateTimePickerField`)
+- **Files**: PascalCase for components, camelCase for utilities (e.g., `errorLogger.ts`, `validation.ts`)
+- **Variables/functions**: camelCase (e.g., `logError`, `validateDuration`)
+- **Constants**: UPPER_SNAKE_CASE for enum values, camelCase for objects
+- **Types/Interfaces**: PascalCase (e.g., `LogFormData`, `ErrorContext`)
+- **Enums**: PascalCase with UPPER_SNAKE_CASE members (e.g., `LogLevel.INFO`)
 
-- **Security**: Review and tighten Firebase security rules before deployment
-- **Performance**: Optimize Firestore queries and implement pagination
-- **Error Monitoring**: Add error tracking for production issues
-- **Analytics**: Consider adding Firebase Analytics for user behavior tracking</content>
-  <parameter name="filePath">/home/jack/Desktop/RealPractice/AGENTS.md
+### Component Patterns
+
+- Client components: start with `"use client"` directive
+- Default exports for page components
+- Named exports for reusable components
+- Barrel exports: use `index.ts` for component groups (see `app/_components/CreateLogForm/index.ts`)
+- Folder structure: `app/_components/ComponentName/` for complex components with subfiles
+
+### Imports Order
+
+```typescript
+import { ... } from "react";
+import { ... } from "firebase/auth";
+import { ... } from "@/context/AuthContext";
+import { ... } from "../_db/db";
+import { ... } from "../../lib/utils/validation";
+import { ... } from "./CreateLogForm/types";
+import { ... } from "./CreateLogForm";
+```
+
+Order: React → Firebase → Path aliases (@/) → Relative parent imports → Relative sibling imports → Local components
+
+### Error Handling
+
+Use the centralized error logging system in `lib/utils/errorLogger.ts`:
+
+```typescript
+import {
+  logError,
+  createComponentContext,
+  LogLevel,
+} from "@/lib/utils/errorLogger";
+
+const errorContext = createComponentContext("ComponentName");
+logError("Descriptive message", error, errorContext.withUser(user));
+```
+
+For validation errors, return structured objects:
+
+```typescript
+return {
+  valid: boolean,
+  error?: string,
+  sanitized?: T
+};
+```
+
+Catch errors with proper type guards:
+
+```typescript
+try {
+  await someAsyncOperation();
+} catch (error) {
+  if (error instanceof Error) {
+    // Handle known error types by message
+    if (error.message.includes("network")) { ... }
+  }
+  throw error; // Re-throw after logging
+}
+```
+
+### File Organization
+
+- `app/` - Next.js pages and layouts
+- `app/_components/` - Shared components (underscore prefix = private)
+- `app/_db/` - Firebase database operations
+- `lib/utils/` - Shared utilities
+- `lib/config/` - Configuration
+- `__tests__/` - Test files (mirrors app structure)
+
+### Testing
+
+- Test files: `*.test.ts` or `*.test.tsx` in `__tests__/` or alongside source
+- Test framework: Jest with `@testing-library/react`
+- Mock Firebase in tests using patterns in `jest.setup.cjs`
+- Use `ts-jest` for TypeScript test files

@@ -1,12 +1,119 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read access to all users collection documents
-    // This allows the fetchRecentPosts function to query and read user data
+    // ============================================
+    // USERS COLLECTION SECURITY RULES
+    // ============================================
     match /users/{userId} {
-      allow read: if true; // Allow all reads for now (adjust for production)
-      allow write: if request.auth != null && request.auth.uid == userId; // Only allow users to write to their own documents
+      // --------------------------------------------
+      // READ RULES
+      // --------------------------------------------
+      allow read: if request.auth != null;
+
+      // --------------------------------------------
+      // CREATE RULES
+      // --------------------------------------------
+      allow create: if (
+        request.auth != null &&
+        request.auth.uid == userId &&
+        isValidUserData(request.resource.data)
+      );
+
+      // --------------------------------------------
+      // UPDATE RULES
+      // --------------------------------------------
+      allow update: if (
+        request.auth != null &&
+        request.auth.uid == userId &&
+        isValidUserUpdate(request.resource.data)
+      );
+
+      // --------------------------------------------
+      // DELETE RULES
+      // --------------------------------------------
+      allow delete: if (
+        request.auth != null &&
+        request.auth.uid == userId
+      );
+    }
+
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+
+    // Check if current user is friends with target user
+    function isFriend(targetUserId) {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.friends.hasAny([targetUserId]);
+    }
+
+    // Validate user data structure and content
+    function isValidUserData(data) {
+      // Basic structure validation
+      return data.keys().hasAll(['name']) &&
+             data.name is string &&
+             data.name.size() > 0 &&
+             data.name.size() <= 50 &&
+             // Validate logs if present
+             (data.logs == null || isValidLogsArray(data.logs)) &&
+             // Validate friends if present
+             (data.friends == null || isValidFriendsArray(data.friends)) &&
+             // No sensitive fields allowed
+             !data.keys().hasAny(['password', 'email', 'phone', 'address', 'ssn']);
+    }
+
+    // Validate user update data
+    function isValidUserUpdate(data) {
+      // Prevent changing user ID
+      return !data.keys().hasAny(['__name__']) &&
+             // Validate name if being updated
+             (data.name == null || (data.name is string && data.name.size() > 0 && data.name.size() <= 50)) &&
+             // Validate logs if being updated
+             (data.logs == null || isValidLogsArray(data.logs)) &&
+             // Validate friends if being updated
+             (data.friends == null || isValidFriendsArray(data.friends)) &&
+             // No sensitive fields allowed
+             !data.keys().hasAny(['password', 'email', 'phone', 'address', 'ssn']);
+    }
+
+    // Validate logs array
+    function isValidLogsArray(logs) {
+      return logs is list &&
+             logs.size() <= 1000 &&
+             logs.all(log, isValidLogItem(log));
+    }
+
+    // Validate individual log item
+    function isValidLogItem(log) {
+      return log is map &&
+             log.keys().hasAll(['dateTimeStr', 'duration', 'description', 'tags']) &&
+             log.dateTimeStr is string &&
+             log.dateTimeStr.size() > 0 &&
+             log.duration is string &&
+             log.duration.size() > 0 &&
+             log.description is string &&
+             log.description.size() <= 1000 &&
+             log.tags is list &&
+             log.tags.size() <= 20 &&
+             log.tags.all(tag, tag is string && tag.size() <= 30);
+    }
+
+    // Validate friends array
+    function isValidFriendsArray(friends) {
+      return friends is list &&
+             friends.size() <= 500 &&
+             friends.all(friend, friend is string && friend.size() > 0 && friend.size() <= 50);
+    }
+
+    // ============================================
+    // QUERY LIMITATIONS
+    // ============================================
+    // Prevent large collection queries that could cause performance issues
+    match /users/{userId} {
+      allow list: if (
+        request.auth != null &&
+        request.query.limit <= 50
+      );
     }
   }
 }

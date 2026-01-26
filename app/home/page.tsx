@@ -1,48 +1,102 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { getRecentPosts } from "../_db/post_feed.tsx";
+import React, { useRef, useCallback, useState } from "react";
 import CreateLog from "../_components/CreateLog";
-import LikeButton from "../_components/like-button";
-import Post from "../_components/post";
+import Log from "../_components/log";
+import { useLogs } from "../context/LogsContext";
+import LoadingGif from "../_components/LoadingGif";
+import { Alert } from "../_components/DesignSystem";
 
 export default function Home() {
-  const [recentPosts, setRecentPosts] = useState<
-    {
-      user: string;
-      dateTimeStr: string;
-      duration: string;
-      tags: string[];
-      description: string | null;
-    }[]
-  >([]);
+  const { logs, loading, error, hasMore, loadMoreLogs } = useLogs();
+  const observer = useRef<IntersectionObserver | null>(null);
+  const [showCreateLog, setShowCreateLog] = useState(false);
 
-  useEffect(() => {
-    async function fetchRecentPosts() {
-      try {
-        const posts = await getRecentPosts("Jack M");
-        setRecentPosts(posts);
-      } catch (error) {
-        console.error("Error fetching recent posts:", error);
-      }
-    }
-    fetchRecentPosts();
-  }, []);
+  const lastLogElementRef = useCallback(
+    (node: HTMLDivElement) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreLogs();
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore, loadMoreLogs]
+  );
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold underline">Home</h1>
-      <div>
-        <CreateLog />
-      </div>
-      <div>
-        <h1>Recent Posts</h1>
+    <div className="container mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Home</h1>
 
-        {recentPosts.map((post, index) => (
-          <React.Fragment key={index}>
-            <LikeButton />
-            <Post key={index} post={{ ...post, index }} />
-          </React.Fragment>
-        ))}
+      {error && (
+        <div className="mb-4">
+          <Alert variant="error" title="Error loading logs">
+            {error.message}
+          </Alert>
+        </div>
+      )}
+
+      <div className="mb-6 sm:mb-8">
+        {!showCreateLog ? (
+          <button
+            onClick={() => setShowCreateLog(true)}
+            className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+          >
+            New Log
+          </button>
+        ) : (
+          <div className="overflow-hidden transition-all duration-500 ease-in-out">
+            <div className="flex justify-between items-center mb-4">
+              <button
+                onClick={() => setShowCreateLog(false)}
+                className="text-gray-600 hover:text-gray-800 font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+            <CreateLog />
+          </div>
+        )}
+      </div>
+
+      <div>
+        <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
+          Recent Logs
+        </h2>
+
+        {loading && logs.length === 0 ? (
+          <div className="flex justify-center py-6 sm:py-8">
+            <LoadingGif />
+          </div>
+        ) : logs.length === 0 ? (
+          <p className="text-gray-500 text-sm sm:text-base">
+            No logs found. Create your first log!
+          </p>
+        ) : (
+          <div>
+            {logs.map((log, index) => (
+              <React.Fragment key={index}>
+                <Log log={{ ...log, index }} />
+              </React.Fragment>
+            ))}
+            {loading && hasMore && (
+              <div className="flex justify-center py-3 sm:py-4">
+                <p className="text-gray-500 text-sm">Loading more logs...</p>
+              </div>
+            )}
+            {!hasMore && (
+              <div className="flex justify-center py-3 sm:py-4">
+                <p className="text-gray-400 text-xs sm:text-sm">
+                  You&apos;ve reached the end!
+                </p>
+              </div>
+            )}
+            <div ref={lastLogElementRef} />
+          </div>
+        )}
       </div>
     </div>
   );

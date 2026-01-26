@@ -7,6 +7,42 @@
     "start": "next start",
     "prepare": "husky install",
     "build:firebase": "npm run build",
-    "deploy:firebase": "npm run build:firebase && firebase deploy"
+    "deploy:firebase": "npm run build:firebase && firebase deploy",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "check-types": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^30.0.0",
+    "@types/react": "19.2.9",
+    "@typescript-eslint/eslint-plugin": "^8.53.0",
+    "@typescript-eslint/parser": "^8.53.0",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "prettier": "^3.7.4",
+    "ts-jest": "^29.4.6"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.23",
+    "firebase": "^12.8.0",
+    "next": "^16.1.4",
+    "postcss": "^8.5.6",
+    "react": "^19.2.3",
+    "react-datepicker": "^9.1.0",
+    "react-dom": "^19.2.3"
   }
 }
