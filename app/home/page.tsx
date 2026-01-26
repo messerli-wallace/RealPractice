@@ -2,29 +2,29 @@
 import React, { useRef, useCallback } from "react";
 import CreateLog from "../_components/CreateLog";
 import LikeButton from "../_components/like-button";
-import Post from "../_components/post";
-import { usePosts } from "../context/PostsContext";
+import Log from "../_components/log";
+import { useLogs } from "../context/LogsContext";
 import LoadingGif from "../_components/LoadingGif";
 import { Alert } from "../_components/DesignSystem";
 
 export default function Home() {
-  const { posts, loading, error, hasMore, loadMorePosts } = usePosts();
+  const { logs, loading, error, hasMore, loadMoreLogs } = useLogs();
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const lastPostElementRef = useCallback(
+  const lastLogElementRef = useCallback(
     (node: HTMLDivElement) => {
       if (loading) return;
       if (observer.current) observer.current.disconnect();
 
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          loadMorePosts();
+          loadMoreLogs();
         }
       });
 
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore, loadMorePosts]
+    [loading, hasMore, loadMoreLogs]
   );
 
   return (
@@ -33,7 +33,7 @@ export default function Home() {
 
       {error && (
         <div className="mb-4">
-          <Alert variant="error" title="Error loading posts">
+          <Alert variant="error" title="Error loading logs">
             {error.message}
           </Alert>
         </div>
@@ -45,28 +45,28 @@ export default function Home() {
 
       <div>
         <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-          Recent Posts
+          Recent Logs
         </h2>
 
-        {loading && posts.length === 0 ? (
+        {loading && logs.length === 0 ? (
           <div className="flex justify-center py-6 sm:py-8">
             <LoadingGif />
           </div>
-        ) : posts.length === 0 ? (
+        ) : logs.length === 0 ? (
           <p className="text-gray-500 text-sm sm:text-base">
-            No posts found. Create your first log!
+            No logs found. Create your first log!
           </p>
         ) : (
           <div>
-            {posts.map((post, index) => (
+            {logs.map((log, index) => (
               <React.Fragment key={index}>
                 <LikeButton />
-                <Post post={{ ...post, index }} />
+                <Log log={{ ...log, index }} />
               </React.Fragment>
             ))}
             {loading && hasMore && (
               <div className="flex justify-center py-3 sm:py-4">
-                <p className="text-gray-500 text-sm">Loading more posts...</p>
+                <p className="text-gray-500 text-sm">Loading more logs...</p>
               </div>
             )}
             {!hasMore && (
@@ -76,7 +76,7 @@ export default function Home() {
                 </p>
               </div>
             )}
-            <div ref={lastPostElementRef} />
+            <div ref={lastLogElementRef} />
           </div>
         )}
       </div>

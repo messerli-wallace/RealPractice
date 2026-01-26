@@ -1,3 +1,3 @@
 export * from "./AuthContext";
-export * from "./PostsContext";
+export * from "./LogsContext";
 export * from "./UIContext";

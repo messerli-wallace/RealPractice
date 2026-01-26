@@ -23,7 +23,7 @@ function getDb() {
   return db;
 }
 
-export async function getRecentPosts(name: string) {
+export async function getRecentLogs(name: string) {
   if (!isConfigured) {
     return [];
   }
@@ -78,7 +78,7 @@ const getFriends = async (
     // Log the error with context
     if (error instanceof Error) {
       logError("Failed to get friends", error, {
-        component: "post_feed",
+        component: "log_feed",
         function: "getFriends",
         metadata: { search, retryCount },
       });
@@ -112,14 +112,14 @@ const queryUserByName = async (
       if (data && data.logs) {
         return { [doc.id]: data.logs.slice(0, 10) };
       } else {
-        return { [doc.id]: [] }; // Return empty array if logs are not available
+        return { [doc.id]: [] };
       }
     });
   } catch (error) {
     // Log the error with context
     if (error instanceof Error) {
       logError("Failed to query user by name", error, {
-        component: "post_feed",
+        component: "log_feed",
         function: "queryUserByName",
         metadata: { search, retryCount },
       });
