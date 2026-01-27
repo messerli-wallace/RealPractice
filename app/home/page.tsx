@@ -4,7 +4,7 @@ import CreateLog from "../_components/CreateLog";
 import Log from "../_components/log";
 import { FilterBar } from "../_components/FilterBar";
 import { useLogs } from "../context/LogsContext";
-import LoadingGif from "../_components/LoadingGif";
+import { SkeletonCard } from "../_components/Skeleton";
 import { Alert } from "../_components/DesignSystem";
 
 export default function Home() {
@@ -95,9 +95,7 @@ export default function Home() {
         </h2>
 
         {loading && logs.length === 0 ? (
-          <div className="flex justify-center py-6 sm:py-8">
-            <LoadingGif />
-          </div>
+          <SkeletonCard count={3} />
         ) : logs.length === 0 ? (
           <p className="text-gray-500 text-sm sm:text-base">
             No logs found. Create your first log!
@@ -110,8 +108,8 @@ export default function Home() {
               </React.Fragment>
             ))}
             {loading && hasMore && (
-              <div className="flex justify-center py-3 sm:py-4">
-                <p className="text-gray-500 text-sm">Loading more logs...</p>
+              <div className="py-3 sm:py-4">
+                <SkeletonCard count={1} />
               </div>
             )}
             {!hasMore && (
