@@ -4,26 +4,23 @@
 - In each log, the user's name should be displayed instead of user id
 - ~~The like button should be changed from a bool to an actual like button, and moved inside the log component.~~ (COMPLETED)
 - ~~the new log component should be hidden until the user presses the "new log" button, then it should appear smoothly.~~ (COMPLETED)
+- Implement optimistic updates with rollback for likes and log creation with proper error recovery
+- Implement debouncing and rate limiting for search inputs and form submissions
+- Complete infinite scroll pagination using Firestore cursor-based queries
+- ~~Add loading states for authentication operations (sign in, sign out) to prevent duplicate requests~~ (COMPLETED)
 
 **Build & Config**
 
 - Remove artificial delays and implement consistent loading indicators
 - Implement proper routing strategies and add API routes
 - Update dependencies and implement security scanning
-
-**Testing**
-
-- Set up Jest with React Testing Library for unit and integration testing
-- Set up end-to-end testing with Cypress/Playwright
-
-**Code Quality**
-
-- Enhance ESLint configuration for stricter rules and add Prettier
+- Remove remaining implicit `any` types and add proper Firebase imports
 
 **UI/UX**
 
 - Add ARIA attributes, keyboard navigation, and screen reader support
 - Create consistent design system with spacing, typography, and visual feedback
+- ~~Implement skeleton loaders for better loading states instead of only GIF spinner~~ (COMPLETED)
 
 **Fixes**
 

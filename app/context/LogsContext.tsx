@@ -116,6 +116,8 @@ export const LogsContextProvider = ({
   // Set up real-time subscription if enabled
   useEffect(() => {
     if (!enableRealtime || !userId) {
+      setAllLogs([]);
+      setLogs([]);
       setLoading(false);
       return;
     }
