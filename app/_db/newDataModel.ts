@@ -20,6 +20,7 @@ import {
   validateLogItem,
 } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
+import { isNetworkError } from "../../lib/utils/networkUtils";
 
 // Collection names for new data model
 const COLLECTIONS = {
@@ -36,21 +37,6 @@ function getDb(): Firestore {
     );
   }
   return db;
-}
-
-/**
- * Helper function to check if an error is network-related
- */
-function isNetworkError(error: unknown): boolean {
-  if (error instanceof Error) {
-    return (
-      error.message.includes("network") ||
-      error.message.includes("timeout") ||
-      error.message.includes("failed to fetch") ||
-      error.message.includes("offline")
-    );
-  }
-  return false;
 }
 
 /**

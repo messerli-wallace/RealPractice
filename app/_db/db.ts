@@ -8,6 +8,7 @@ import {
   arrayRemove,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { isNetworkError } from "../../lib/utils/networkUtils";
 import {
   UserData,
   LogItem,
@@ -17,21 +18,6 @@ import {
   ErrorMetadata,
 } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
-
-/**
- * Helper function to check if an error is network-related
- */
-function isNetworkError(error: unknown): boolean {
-  if (error instanceof Error) {
-    return (
-      error.message.includes("network") ||
-      error.message.includes("timeout") ||
-      error.message.includes("failed to fetch") ||
-      error.message.includes("offline")
-    );
-  }
-  return false;
-}
 
 export const createData = async (
   docPath: string,
