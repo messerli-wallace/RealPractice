@@ -6,9 +6,8 @@ import {
   deleteDoc,
   arrayUnion,
   arrayRemove,
-  Firestore,
 } from "firebase/firestore";
-import { db, isConfigured } from "../firebase";
+import { db } from "../firebase";
 import {
   UserData,
   LogItem,
