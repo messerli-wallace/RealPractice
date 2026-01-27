@@ -131,6 +131,9 @@ export const subscribeToFriendsLogs = (
       unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
       unsubscribeFunctions = [];
 
+      // Initial combine first
+      await combineAndUpdateLogs();
+
       // Subscribe to each user
       for (const friendId of allUserIds) {
         const unsubscribe = subscribeToUserLogs(
@@ -145,9 +148,6 @@ export const subscribeToFriendsLogs = (
         );
         unsubscribeFunctions.push(unsubscribe);
       }
-
-      // Initial combine
-      await combineAndUpdateLogs();
 
       async function combineAndUpdateLogs() {
         try {

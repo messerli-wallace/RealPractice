@@ -19,8 +19,10 @@ import { docExists } from "../_db/db";
 
 interface AuthContextType {
   user: FirebaseUser | null;
-  googleSignIn: () => void;
-  logOut: () => void;
+  isGoogleSignInLoading: boolean;
+  isLogOutLoading: boolean;
+  googleSignIn: () => Promise<void>;
+  logOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,22 +33,34 @@ interface AuthContextProviderProps {
 
 export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
+  const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
+  const [isLogOutLoading, setIsLogOutLoading] = useState(false);
 
-  const googleSignIn = () => {
+  const googleSignIn = async () => {
     if (!isConfigured || !auth) {
       console.warn("Firebase is not configured. Cannot sign in.");
       return;
     }
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider);
+    setIsGoogleSignInLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } finally {
+      setIsGoogleSignInLoading(false);
+    }
   };
 
-  const logOut = () => {
+  const logOut = async () => {
     if (!isConfigured || !auth) {
       console.warn("Firebase is not configured. Cannot sign out.");
       return;
     }
-    signOut(auth);
+    setIsLogOutLoading(true);
+    try {
+      await signOut(auth);
+    } finally {
+      setIsLogOutLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -63,7 +77,15 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, googleSignIn, logOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isGoogleSignInLoading,
+        isLogOutLoading,
+        googleSignIn,
+        logOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

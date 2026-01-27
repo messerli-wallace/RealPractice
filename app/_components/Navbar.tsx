@@ -3,7 +3,8 @@ import Link from "next/link";
 import { UserAuth } from "../context/AuthContext";
 
 const Navbar = () => {
-  const { user, googleSignIn, logOut } = UserAuth();
+  const { user, googleSignIn, logOut, isGoogleSignInLoading, isLogOutLoading } =
+    UserAuth();
 
   const handleSignIn = async () => {
     try {
@@ -95,15 +96,42 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={handleSignIn}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+                    disabled={isGoogleSignInLoading}
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Login
+                    {isGoogleSignInLoading ? "Loading..." : "Login"}
                   </button>
                   <button
                     onClick={handleSignIn}
-                    className="px-4 sm:px-5 py-1.5 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg"
+                    disabled={isGoogleSignInLoading}
+                    className="px-4 sm:px-5 py-1.5 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Sign Up
+                    {isGoogleSignInLoading ? (
+                      <span className="flex items-center justify-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        Signing in...
+                      </span>
+                    ) : (
+                      "Sign Up"
+                    )}
                   </button>
                 </>
               ) : (
@@ -128,9 +156,10 @@ const Navbar = () => {
                   </div>
                   <button
                     onClick={logOut}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 rounded-lg transition-all"
+                    disabled={isLogOutLoading}
+                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Sign Out
+                    {isLogOutLoading ? "Signing out..." : "Sign Out"}
                   </button>
                 </>
               )}

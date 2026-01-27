@@ -5,6 +5,7 @@ import {
   validateSearchResultItem,
 } from "../../../types/index";
 import { logError } from "../../../lib/utils/errorLogger";
+import { isNetworkError } from "../../../lib/utils/networkUtils";
 
 function getDb() {
   if (!isConfigured || !db) {
@@ -13,21 +14,6 @@ function getDb() {
     );
   }
   return db;
-}
-
-/**
- * Helper function to check if an error is network-related
- */
-function isNetworkError(error: unknown): boolean {
-  if (error instanceof Error) {
-    return (
-      error.message.includes("network") ||
-      error.message.includes("timeout") ||
-      error.message.includes("failed to fetch") ||
-      error.message.includes("offline")
-    );
-  }
-  return false;
 }
 
 // Function to perform a query

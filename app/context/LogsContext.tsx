@@ -6,11 +6,12 @@ import React, {
   useState,
   useEffect,
   ReactNode,
+  useCallback,
 } from "react";
-import { getRecentLogs } from "../_db/log_feed";
 import { subscribeToFriendsLogs } from "../_db/realtimeService";
 import { OrganizedLogEntry } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
+import { UserAuth } from "./AuthContext";
 
 interface Log {
   user: string;
@@ -22,6 +23,7 @@ interface Log {
 
 interface LogsContextType {
   logs: Log[];
+  allLogs: Log[];
   loading: boolean;
   error: Error | null;
   hasMore: boolean;
@@ -29,73 +31,106 @@ interface LogsContextType {
   refreshLogs: () => Promise<void>;
   addLog: (log: Log) => void;
   loadMoreLogs: () => Promise<void>;
+  tagFilter: string;
+  setTagFilter: (value: string) => void;
+  userFilter: string;
+  setUserFilter: (value: string) => void;
+  showOnlyMine: boolean;
+  setShowOnlyMine: (value: boolean) => void;
+  clearFilters: () => void;
+  currentUserName: string;
+  userId: string | null;
 }
 
 const LogsContext = createContext<LogsContextType | undefined>(undefined);
 
 interface LogsContextProviderProps {
   children: ReactNode;
-  initialUserId?: string;
   enableRealtime?: boolean;
 }
 
 export const LogsContextProvider = ({
   children,
-  initialUserId = "Jack M",
   enableRealtime = true,
 }: LogsContextProviderProps) => {
+  const { user: authUser } = UserAuth();
+  const [allLogs, setAllLogs] = useState<Log[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [_pageSize] = useState(10);
+  const [tagFilter, setTagFilter] = useState("");
+  const [userFilter, setUserFilter] = useState("");
+  const [showOnlyMine, setShowOnlyMine] = useState(false);
 
-  const fetchLogs = async (pageNum: number = 1, append: boolean = false) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const recentLogs = await getRecentLogs(initialUserId);
+  const userId = authUser?.uid || "";
+  const currentUserName = authUser?.displayName || "";
 
-      // Simulate pagination - in a real app, this would come from the API
-      const startIndex = (pageNum - 1) * _pageSize;
-      const endIndex = startIndex + _pageSize;
-      const paginatedLogs = recentLogs.slice(startIndex, endIndex);
+  if (!userId && enableRealtime) {
+    console.warn("No authenticated user found - logs will not load");
+  }
 
-      if (append) {
-        setLogs((prevLogs) => [...prevLogs, ...paginatedLogs]);
-      } else {
-        setLogs(paginatedLogs);
-      }
-
-      // Check if there are more logs to load
-      setHasMore(endIndex < recentLogs.length);
-      setPage(pageNum);
-    } catch (err) {
-      if (err instanceof Error) {
-        logError("Error fetching logs", err, {
-          component: "LogsContext",
-          function: "fetchLogs",
-        });
-        setError(err);
-      }
-    } finally {
-      setLoading(false);
-    }
+  const clearFilters = () => {
+    setTagFilter("");
+    setUserFilter("");
+    setShowOnlyMine(false);
   };
+
+  const filterLogs = useCallback(() => {
+    const filteredLogs = allLogs.filter((log) => {
+      const matchesTagFilter = tagFilter
+        ? tagFilter
+            .split(",")
+            .map((tag) => tag.trim().toLowerCase())
+            .some((tag) =>
+              log.tags.some((logTag) => logTag.toLowerCase().includes(tag))
+            )
+        : true;
+
+      const matchesUserFilter = userFilter
+        ? log.user.toLowerCase().includes(userFilter.toLowerCase())
+        : true;
+
+      const matchesShowOnlyMine = showOnlyMine
+        ? log.user === currentUserName
+        : true;
+
+      return matchesTagFilter && matchesUserFilter && matchesShowOnlyMine;
+    });
+
+    const paginatedFilteredLogs = filteredLogs.slice(0, page * _pageSize);
+    setLogs(paginatedFilteredLogs);
+    setHasMore(filteredLogs.length > paginatedFilteredLogs.length);
+  }, [
+    allLogs,
+    tagFilter,
+    userFilter,
+    showOnlyMine,
+    currentUserName,
+    page,
+    _pageSize,
+  ]);
 
   // Set up real-time subscription if enabled
   useEffect(() => {
-    if (!enableRealtime) return;
+    if (!enableRealtime || !userId) {
+      setAllLogs([]);
+      setLogs([]);
+      setLoading(false);
+      return;
+    }
 
     let unsubscribe: () => void = () => {};
 
     const setupRealtimeSubscription = async () => {
       try {
         unsubscribe = subscribeToFriendsLogs(
-          initialUserId,
+          userId,
           (updatedLogs: OrganizedLogEntry[]) => {
-            // Convert to pagination format
+            setLoading(false);
+            setAllLogs(updatedLogs);
             const startIndex = 0;
             const endIndex = _pageSize;
             const paginatedLogs = updatedLogs.slice(startIndex, endIndex);
@@ -105,6 +140,7 @@ export const LogsContextProvider = ({
             setPage(1);
           },
           (error: Error) => {
+            setLoading(false);
             logError("Realtime subscription error", error, {
               component: "LogsContext",
               function: "realtimeSubscription",
@@ -113,6 +149,7 @@ export const LogsContextProvider = ({
           }
         );
       } catch (error) {
+        setLoading(false);
         if (error instanceof Error) {
           logError("Failed to set up realtime subscription", error, {
             component: "LogsContext",
@@ -128,30 +165,29 @@ export const LogsContextProvider = ({
     return () => {
       unsubscribe();
     };
-  }, [initialUserId, enableRealtime, _pageSize]);
+  }, [userId, enableRealtime, _pageSize]);
 
   const refreshLogs = async () => {
-    await fetchLogs(1, false);
+    setLoading(true);
   };
 
   const loadMoreLogs = async () => {
     if (loading || !hasMore) return;
-    await fetchLogs(page + 1, true);
   };
 
   const addLog = (log: Log) => {
-    setLogs((prevLogs) => [log, ...prevLogs]);
+    setAllLogs((prevLogs) => [log, ...prevLogs]);
   };
 
   useEffect(() => {
-    fetchLogs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialUserId]);
+    filterLogs();
+  }, [filterLogs]);
 
   return (
     <LogsContext.Provider
       value={{
         logs,
+        allLogs,
         loading,
         error,
         hasMore,
@@ -159,6 +195,15 @@ export const LogsContextProvider = ({
         refreshLogs,
         addLog,
         loadMoreLogs,
+        tagFilter,
+        setTagFilter,
+        userFilter,
+        setUserFilter,
+        showOnlyMine,
+        setShowOnlyMine,
+        clearFilters,
+        currentUserName,
+        userId,
       }}
     >
       {children}
