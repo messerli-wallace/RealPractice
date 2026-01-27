@@ -21,7 +21,7 @@ export default function Home() {
     showOnlyMine,
     setShowOnlyMine,
     clearFilters,
-    initialUserId,
+    currentUserName,
   } = useLogs();
   const observer = useRef<IntersectionObserver | null>(null);
   const [showCreateLog, setShowCreateLog] = useState(false);
@@ -84,7 +84,7 @@ export default function Home() {
         setUserFilter={setUserFilter}
         showOnlyMine={showOnlyMine}
         setShowOnlyMine={setShowOnlyMine}
-        currentUserName={initialUserId}
+        currentUserName={currentUserName}
         hasActiveFilters={!!tagFilter || !!userFilter || showOnlyMine}
         clearFilters={clearFilters}
       />

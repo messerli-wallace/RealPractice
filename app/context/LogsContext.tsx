@@ -8,10 +8,10 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-import { getRecentLogs } from "../_db/log_feed";
 import { subscribeToFriendsLogs } from "../_db/realtimeService";
 import { OrganizedLogEntry } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
+import { UserAuth } from "./AuthContext";
 
 interface Log {
   user: string;
@@ -38,22 +38,22 @@ interface LogsContextType {
   showOnlyMine: boolean;
   setShowOnlyMine: (value: boolean) => void;
   clearFilters: () => void;
-  initialUserId: string;
+  currentUserName: string;
+  userId: string | null;
 }
 
 const LogsContext = createContext<LogsContextType | undefined>(undefined);
 
 interface LogsContextProviderProps {
   children: ReactNode;
-  initialUserId?: string;
   enableRealtime?: boolean;
 }
 
 export const LogsContextProvider = ({
   children,
-  initialUserId = "Jack M",
   enableRealtime = true,
 }: LogsContextProviderProps) => {
+  const { user: authUser } = UserAuth();
   const [allLogs, setAllLogs] = useState<Log[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +64,13 @@ export const LogsContextProvider = ({
   const [tagFilter, setTagFilter] = useState("");
   const [userFilter, setUserFilter] = useState("");
   const [showOnlyMine, setShowOnlyMine] = useState(false);
+
+  const userId = authUser?.uid || "";
+  const currentUserName = authUser?.displayName || "";
+
+  if (!userId && enableRealtime) {
+    console.warn("No authenticated user found - logs will not load");
+  }
 
   const clearFilters = () => {
     setTagFilter("");
@@ -87,7 +94,7 @@ export const LogsContextProvider = ({
         : true;
 
       const matchesShowOnlyMine = showOnlyMine
-        ? log.user === initialUserId
+        ? log.user === currentUserName
         : true;
 
       return matchesTagFilter && matchesUserFilter && matchesShowOnlyMine;
@@ -101,60 +108,27 @@ export const LogsContextProvider = ({
     tagFilter,
     userFilter,
     showOnlyMine,
-    initialUserId,
+    currentUserName,
     page,
     _pageSize,
   ]);
 
-  const fetchLogs = async (pageNum: number = 1, append: boolean = false) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const recentLogs = await getRecentLogs(initialUserId);
-
-      setAllLogs(recentLogs);
-
-      if (append) {
-        setAllLogs((prevLogs) => [...prevLogs, ...recentLogs]);
-      }
-
-      const startIndex = (pageNum - 1) * _pageSize;
-      const endIndex = startIndex + _pageSize;
-      const paginatedLogs = recentLogs.slice(startIndex, endIndex);
-
-      if (append) {
-        setLogs((prevLogs) => [...prevLogs, ...paginatedLogs]);
-      } else {
-        setLogs(paginatedLogs);
-      }
-
-      setHasMore(endIndex < recentLogs.length);
-      setPage(pageNum);
-    } catch (err) {
-      if (err instanceof Error) {
-        logError("Error fetching logs", err, {
-          component: "LogsContext",
-          function: "fetchLogs",
-        });
-        setError(err);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Set up real-time subscription if enabled
   useEffect(() => {
-    if (!enableRealtime) return;
+    if (!enableRealtime || !userId) {
+      setLoading(false);
+      return;
+    }
 
     let unsubscribe: () => void = () => {};
 
     const setupRealtimeSubscription = async () => {
       try {
         unsubscribe = subscribeToFriendsLogs(
-          initialUserId,
+          userId,
           (updatedLogs: OrganizedLogEntry[]) => {
-            // Convert to pagination format
+            setLoading(false);
+            setAllLogs(updatedLogs);
             const startIndex = 0;
             const endIndex = _pageSize;
             const paginatedLogs = updatedLogs.slice(startIndex, endIndex);
@@ -164,6 +138,7 @@ export const LogsContextProvider = ({
             setPage(1);
           },
           (error: Error) => {
+            setLoading(false);
             logError("Realtime subscription error", error, {
               component: "LogsContext",
               function: "realtimeSubscription",
@@ -172,6 +147,7 @@ export const LogsContextProvider = ({
           }
         );
       } catch (error) {
+        setLoading(false);
         if (error instanceof Error) {
           logError("Failed to set up realtime subscription", error, {
             component: "LogsContext",
@@ -187,15 +163,14 @@ export const LogsContextProvider = ({
     return () => {
       unsubscribe();
     };
-  }, [initialUserId, enableRealtime, _pageSize]);
+  }, [userId, enableRealtime, _pageSize]);
 
   const refreshLogs = async () => {
-    await fetchLogs(1, false);
+    setLoading(true);
   };
 
   const loadMoreLogs = async () => {
     if (loading || !hasMore) return;
-    await fetchLogs(page + 1, true);
   };
 
   const addLog = (log: Log) => {
@@ -225,7 +200,8 @@ export const LogsContextProvider = ({
         showOnlyMine,
         setShowOnlyMine,
         clearFilters,
-        initialUserId,
+        currentUserName,
+        userId,
       }}
     >
       {children}
