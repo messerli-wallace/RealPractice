@@ -54,7 +54,6 @@ logIndexes/ (Search indexes)
     - logIds: string[] (references to userLogs)
 ```
 
-
 ## Indexing Strategy
 
 1. **Automatic Firestore Indexes**: Use Firestore's built-in indexing for common queries
