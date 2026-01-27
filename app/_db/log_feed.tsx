@@ -4,6 +4,8 @@ import {
   query,
   where,
   DocumentSnapshot,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { db, isConfigured } from "../firebase";
 import {
@@ -11,6 +13,7 @@ import {
   OrganizedLogEntry,
   LogEntry,
   validateLogEntry,
+  UserData,
 } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
 
@@ -23,15 +26,15 @@ function getDb() {
   return db;
 }
 
-export async function getRecentLogs(name: string) {
-  if (!isConfigured) {
+export async function getRecentLogs(userId: string) {
+  if (!isConfigured || !userId) {
     return [];
   }
   const allFriendData: UserLogData[] = [];
-  const userdata = await getFriends(name);
-  const flattenedUserData = userdata.flat();
-  for (const friendName of flattenedUserData) {
-    const friendData = await queryUserByName(friendName);
+  const userdata = await getFriends(userId);
+  const flattenedUserIds = userdata.flat();
+  for (const friendId of flattenedUserIds) {
+    const friendData = await queryUserById(friendId);
     allFriendData.push(...friendData);
   }
 
@@ -55,85 +58,79 @@ function isNetworkError(error: unknown): boolean {
 }
 
 const getFriends = async (
-  search: string,
+  userId: string,
   retryCount = 0
 ): Promise<string[]> => {
   try {
     const db = getDb();
-    const coll = collection(db, "users");
-    const q = query(coll, where("name", "==", search));
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
 
-    const targetAccounts = await getDocs(q);
+    const userDocData = userDoc.data();
     const friendsArrays: string[] = [];
-    friendsArrays.push(search);
-    targetAccounts.forEach((doc) => {
-      const data = doc.data();
-      if (Object.prototype.hasOwnProperty.call(data, "friends")) {
-        friendsArrays.push(...data.friends);
-      }
-    });
+    friendsArrays.push(userId);
+    if (
+      userDocData &&
+      Object.prototype.hasOwnProperty.call(userDocData, "friends")
+    ) {
+      friendsArrays.push(...userDocData.friends);
+    }
 
     return friendsArrays;
   } catch (error) {
-    // Log the error with context
     if (error instanceof Error) {
       logError("Failed to get friends", error, {
         component: "log_feed",
         function: "getFriends",
-        metadata: { search, retryCount },
+        metadata: { userId, retryCount },
       });
     }
 
-    // Implement retry logic for network errors
     if (retryCount < 3 && isNetworkError(error)) {
       await new Promise((resolve) =>
         setTimeout(resolve, 1000 * Math.pow(2, retryCount))
       );
-      return getFriends(search, retryCount + 1);
+      return getFriends(userId, retryCount + 1);
     }
 
     throw error;
   }
 };
 
-const queryUserByName = async (
-  search: string,
+const queryUserById = async (
+  userId: string,
   retryCount = 0
 ): Promise<UserLogData[]> => {
   try {
     const db = getDb();
-    const coll = collection(db, "users");
-    const q = query(coll, where("name", "==", search));
+    const userDocRef = doc(db, "users", userId);
+    const userDoc = await getDoc(userDocRef);
 
-    const targetAccounts = await getDocs(q);
+    if (!userDoc.exists()) {
+      return [];
+    }
 
-    return targetAccounts.docs.map((doc: DocumentSnapshot) => {
-      const data = doc.data();
-      if (!data) {
-        return { [doc.id]: [] };
-      }
-      if (data.logs) {
-        return { [data.name || doc.id]: data.logs.slice(0, 10) };
-      } else {
-        return { [data.name || doc.id]: [] };
-      }
-    });
+    const data = userDoc.data() as UserData;
+    const userName = data?.name || userId;
+
+    if (!data || !data.logs) {
+      return [{ [userName]: [] }];
+    }
+    return [{ [userName]: data.logs }];
   } catch (error) {
-    // Log the error with context
     if (error instanceof Error) {
-      logError("Failed to query user by name", error, {
+      logError("Failed to query user by id", error, {
         component: "log_feed",
-        function: "queryUserByName",
-        metadata: { search, retryCount },
+        function: "queryUserById",
+        metadata: { userId, retryCount },
       });
     }
 
-    // Implement retry logic for network errors
     if (retryCount < 3 && isNetworkError(error)) {
       await new Promise((resolve) =>
         setTimeout(resolve, 1000 * Math.pow(2, retryCount))
       );
-      return queryUserByName(search, retryCount + 1);
+      return queryUserById(userId, retryCount + 1);
     }
 
     throw error;
