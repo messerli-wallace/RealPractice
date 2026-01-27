@@ -2,12 +2,27 @@
 import React, { useRef, useCallback, useState } from "react";
 import CreateLog from "../_components/CreateLog";
 import Log from "../_components/log";
+import { FilterBar } from "../_components/FilterBar";
 import { useLogs } from "../context/LogsContext";
-import LoadingGif from "../_components/LoadingGif";
+import { SkeletonCard } from "../_components/Skeleton";
 import { Alert } from "../_components/DesignSystem";
 
 export default function Home() {
-  const { logs, loading, error, hasMore, loadMoreLogs } = useLogs();
+  const {
+    logs,
+    loading,
+    error,
+    hasMore,
+    loadMoreLogs,
+    tagFilter,
+    setTagFilter,
+    userFilter,
+    setUserFilter,
+    showOnlyMine,
+    setShowOnlyMine,
+    clearFilters,
+    currentUserName,
+  } = useLogs();
   const observer = useRef<IntersectionObserver | null>(null);
   const [showCreateLog, setShowCreateLog] = useState(false);
 
@@ -62,15 +77,25 @@ export default function Home() {
         )}
       </div>
 
+      <FilterBar
+        tagFilter={tagFilter}
+        setTagFilter={setTagFilter}
+        userFilter={userFilter}
+        setUserFilter={setUserFilter}
+        showOnlyMine={showOnlyMine}
+        setShowOnlyMine={setShowOnlyMine}
+        currentUserName={currentUserName}
+        hasActiveFilters={!!tagFilter || !!userFilter || showOnlyMine}
+        clearFilters={clearFilters}
+      />
+
       <div>
         <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
           Recent Logs
         </h2>
 
         {loading && logs.length === 0 ? (
-          <div className="flex justify-center py-6 sm:py-8">
-            <LoadingGif />
-          </div>
+          <SkeletonCard count={3} />
         ) : logs.length === 0 ? (
           <p className="text-gray-500 text-sm sm:text-base">
             No logs found. Create your first log!
@@ -83,8 +108,8 @@ export default function Home() {
               </React.Fragment>
             ))}
             {loading && hasMore && (
-              <div className="flex justify-center py-3 sm:py-4">
-                <p className="text-gray-500 text-sm">Loading more logs...</p>
+              <div className="py-3 sm:py-4">
+                <SkeletonCard count={1} />
               </div>
             )}
             {!hasMore && (
