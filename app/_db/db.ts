@@ -19,15 +19,6 @@ import {
 } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
 
-function getDb(): Firestore {
-  if (!isConfigured || !db) {
-    throw new Error(
-      "Firebase is not configured. Please set up your Firebase credentials."
-    );
-  }
-  return db;
-}
-
 /**
  * Helper function to check if an error is network-related
  */
@@ -53,7 +44,6 @@ export const createData = async (
    Will merge an existing document with the same docPath
    */
   try {
-    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await setDoc(docRef, data, { merge: true });
   } catch (error) {
@@ -93,7 +83,6 @@ export const readData = async (
    https://firebase.google.com/docs/firestore/query-data/get-data?authuser=0
     */
   try {
-    const db = getDb();
     const docRef = doc(db, "users", docPath);
     const docSnap = await getDoc(docRef);
     const data = docSnap.data();
@@ -131,7 +120,6 @@ export const updateData = async (
     updates the docPath document with the inputted data
     */
   try {
-    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await updateDoc(docRef, data);
   } catch (error) {
@@ -164,7 +152,6 @@ export const deleteData = async (
     Deletes the document at docPath
     */
   try {
-    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await deleteDoc(docRef);
   } catch (error) {
@@ -195,7 +182,6 @@ export const addLog = async (
   }
 
   try {
-    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await updateDoc(docRef, {
       logs: arrayUnion(newLog),
@@ -222,7 +208,6 @@ export const removeLog = async (
     Deletes a specific log
     */
   try {
-    const db = getDb();
     const docRef = doc(db, "users", docPath);
     await updateDoc(docRef, {
       logs: arrayRemove(badLog),
@@ -252,7 +237,6 @@ export const docExists = async (
    * If the doc doesn't exists, this function creates it
    */
   try {
-    const db = getDb();
     const docRef = doc(db, "users", docName);
     const docSnap = await getDoc(docRef);
 
