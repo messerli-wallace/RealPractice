@@ -173,6 +173,30 @@ export const LogsContextProvider = ({
 
   const loadMoreLogs = async () => {
     if (loading || !hasMore) return;
+
+    setLoading(true);
+    try {
+      // Increment page to load more logs
+      const nextPage = page + 1;
+      setPage(nextPage);
+
+      // filterLogs will be called via useEffect when page changes
+      // The filtering and pagination logic in filterLogs handles the rest
+    } catch (err) {
+      logError(
+        "Failed to load more logs",
+        err instanceof Error ? err : new Error(String(err)),
+        {
+          component: "LogsContext",
+          function: "loadMoreLogs",
+        }
+      );
+      setError(
+        err instanceof Error ? err : new Error("Failed to load more logs")
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const addLog = (log: Log) => {

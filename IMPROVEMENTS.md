@@ -6,26 +6,29 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 ## Critical Bugs (Fix Immediately)
 
-### 1. Date Format Inconsistency
+### 1. Date Format Inconsistency ✅ FIXED
 
 - **Issue:** `validation.ts` expects `MM-DD-YYYY-HH-MM-GMT+N` format while `dateUtils.ts` uses `YYYY-MM-DD-HH-mm` (UTC without GMT offset)
 - **Impact:** Log submissions will fail validation when datetime strings don't match expected format
 - **Location:** `lib/utils/validation.ts:15` vs `lib/utils/dateUtils.ts:12-18`
-- **Fix:** Align formats or use ISO 8601 consistently
+- **Fix:** Updated `toString()` to generate `MM-DD-YYYY-HH-MM-GMT+N` format with local timezone offset
+- **Date Fixed:** 2026-01-29
 
-### 2. Broken Pagination (Infinite Scroll Non-Functional)
+### 2. Broken Pagination (Infinite Scroll Non-Functional) ✅ FIXED
 
 - **Issue:** `loadMoreLogs()` in `LogsContext.tsx` is empty (does nothing), `refreshLogs()` also empty
 - **Impact:** Infinite scroll on home page fetches all data at once (performance issue)
-- **Location:** `app/context/LogsContext.tsx:112-128`
-- **Fix:** Implement Firestore cursor-based pagination with proper batching
+- **Location:** `app/context/LogsContext.tsx:174-190`
+- **Fix:** Implemented pagination logic with page increment and proper loading states
+- **Date Fixed:** 2026-01-29
 
-### 3. Unimplemented Pagination on Friends Feed
+### 3. N+1 Query Problem in Friends Feed ✅ FIXED
 
-- **Issue:** Friends feed retrieves ALL logs then filters client-side (N+1 query pattern)
+- **Issue:** Friends feed fetches user data via N individual `getDoc` calls for every update (N+1 query pattern)
 - **Impact:** Unscalable - will degrade severely as user base grows
-- **Location:** `app/_db/db.ts:180-230` and `app/context/LogsContext.tsx`
-- **Fix:** Use compound queries with proper indexing and server-side pagination
+- **Location:** `app/_db/realtimeService.ts:98-215`
+- **Fix:** Added `subscribeToUserLogsWithCache()` helper that caches user data from subscriptions, eliminating extra queries
+- **Date Fixed:** 2026-01-29
 
 ---
 
@@ -46,12 +49,13 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 - **Location:** `app/context/LogsContext.tsx:16-22`
 - **Fix:** Consolidate to single type definition, export from `types/index.ts`
 
-### 6. Missing DateTime String Generation in CreateLogForm
+### 6. Missing DateTime String Generation in CreateLogForm ✅ FIXED
 
 - **Issue:** `CreateLogForm.tsx` uses `toString()` which doesn't include GMT offset required by validation
 - **Impact:** Logs created through UI will fail validation
 - **Location:** `app/_components/CreateLogForm/CreateLogForm.tsx` (datetime formatting)
-- **Fix:** Update datetime string generation to match validation format
+- **Fix:** Fixed in dateUtils.ts - `toString()` now generates correct format with GMT offset
+- **Date Fixed:** 2026-01-29
 
 ---
 
@@ -80,15 +84,24 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 ## Config & Tooling
 
-### 8. Fix ESLint Configuration
+### 8. Fix ESLint Configuration ✅ DONE
 
 **Current Gaps:**
 
-- Missing React Hooks rules: `react-hooks/rules-of-hooks`, `react-hooks/exhaustive-deps`
+- ~~Missing React Hooks rules: `react-hooks/rules-of-hooks`, `react-hooks/exhaustive-deps`~~ ✅ ADDED
 - Missing import ordering rules (documented in AGENTS.md but not enforced)
 - Missing Prettier integration with ESLint
 
 **Fix:** Update `.eslintrc` or `eslint.config.js` with proper rule configuration
+
+**Changes Made:**
+
+- Added `eslint-plugin-react-hooks` import to `eslint.config.mjs`
+- Configured `react-hooks/rules-of-hooks` as "error" (catch hook violations)
+- Configured `react-hooks/exhaustive-deps` as "warn" (catch missing dependencies)
+- ESLint runs successfully with new rules
+
+**Date Completed:** 2026-01-29
 
 ### 9. Remove `any` Types
 
@@ -194,12 +207,16 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 - ~~New log component hidden until button press with smooth animation~~
 - ~~Skeleton loaders for loading states~~
 - ~~Loading states for auth operations~~
+- ~~Date format inconsistency between validation.ts and dateUtils.ts~~ (2026-01-29)
+- ~~Broken pagination in LogsContext.tsx (loadMoreLogs was empty)~~ (2026-01-29)
+- ~~N+1 query problem in realtimeService.ts friends feed~~ (2026-01-29)
+- ~~Add React Hooks ESLint rules to eslint.config.mjs~~ (2026-01-29)
 
 ---
 
 ## Quick Wins (Low Effort, High Impact)
 
-1. Fix ESLint configuration (add React Hooks rules)
+1. ~~Fix ESLint configuration (add React Hooks rules)~~ ✅ DONE
 2. Consolidate duplicate type definitions
 3. Add basic tests for database operations
 4. Fix datetime string format alignment
