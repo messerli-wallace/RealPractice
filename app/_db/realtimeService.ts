@@ -34,12 +34,10 @@ export const subscribeToUserLogs = (
 ): Unsubscribe => {
   if (!isConfigured) {
     onError(new Error("Firebase not configured"));
-    return () => {}; // Return empty unsubscribe function
+    return () => {};
   }
 
   const db = getDb();
-
-  // Subscribe to the user's document changes
   const userDocRef = doc(db, "users", userId);
 
   return onSnapshot(
@@ -50,7 +48,6 @@ export const subscribeToUserLogs = (
           const userData = docSnapshot.data() as UserData;
           const logs = userData.logs || [];
 
-          // Convert logs to organized format
           const organizedLogs: OrganizedLogEntry[] = logs
             .filter((log) => validateLogEntry(log))
             .map((log) => ({
@@ -61,7 +58,6 @@ export const subscribeToUserLogs = (
               description: log.description || null,
             }));
 
-          // Sort by date (newest first)
           organizedLogs.sort((a, b) =>
             compareDates(a.dateTimeStr, b.dateTimeStr)
           );
@@ -95,7 +91,57 @@ export const subscribeToUserLogs = (
 };
 
 /**
+ * Subscribe to real-time updates for a user's logs and provide raw user data
+ * Used internally to avoid N+1 queries
+ */
+const subscribeToUserLogsWithCache = (
+  userId: string,
+  onUpdate: (userData: UserData) => void,
+  onError: (error: Error) => void
+): Unsubscribe => {
+  if (!isConfigured) {
+    onError(new Error("Firebase not configured"));
+    return () => {};
+  }
+
+  const db = getDb();
+  const userDocRef = doc(db, "users", userId);
+
+  return onSnapshot(
+    userDocRef,
+    (docSnapshot) => {
+      try {
+        if (docSnapshot.exists()) {
+          const userData = docSnapshot.data() as UserData;
+          onUpdate(userData);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          logError("Error in user logs cache subscription", error, {
+            component: "realtimeService",
+            function: "subscribeToUserLogsWithCache",
+            metadata: { userId },
+          });
+          onError(error);
+        }
+      }
+    },
+    (error) => {
+      if (error instanceof Error) {
+        logError("Error in user logs cache subscription", error, {
+          component: "realtimeService",
+          function: "subscribeToUserLogsWithCache",
+          metadata: { userId },
+        });
+        onError(error);
+      }
+    }
+  );
+};
+
+/**
  * Subscribe to real-time updates for multiple users (friends feed)
+ * Optimized to avoid N+1 queries by caching user data from subscriptions
  */
 export const subscribeToFriendsLogs = (
   userId: string,
@@ -104,13 +150,13 @@ export const subscribeToFriendsLogs = (
 ): Unsubscribe => {
   if (!isConfigured) {
     onError(new Error("Firebase not configured"));
-    return () => {}; // Return empty unsubscribe function
+    return () => {};
   }
 
   const db = getDb();
   let unsubscribeFunctions: Unsubscribe[] = [];
+  const userDataCache = new Map<string, UserData>();
 
-  // First, get the user's friends list
   const getFriendsAndSubscribe = async () => {
     try {
       const userDocRef = doc(db, "users", userId);
@@ -123,25 +169,17 @@ export const subscribeToFriendsLogs = (
 
       const userData = userDoc.data();
       const friends = userData.friends || [];
-
-      // Include the user themselves in the feed
       const allUserIds = [userId, ...friends];
 
-      // Clean up any existing subscriptions
       unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
       unsubscribeFunctions = [];
+      userDataCache.clear();
 
-      // Initial combine first
-      await combineAndUpdateLogs();
-
-      // Subscribe to each user
       for (const friendId of allUserIds) {
-        const unsubscribe = subscribeToUserLogs(
+        const unsubscribe = subscribeToUserLogsWithCache(
           friendId,
-          () => {
-            // When we get updates from any user, combine all logs
-            // This is a simple approach - in production, you might want
-            // to optimize this to avoid recomputing the entire list
+          (userData) => {
+            userDataCache.set(friendId, userData);
             combineAndUpdateLogs();
           },
           onError
@@ -149,38 +187,30 @@ export const subscribeToFriendsLogs = (
         unsubscribeFunctions.push(unsubscribe);
       }
 
-      async function combineAndUpdateLogs() {
+      function combineAndUpdateLogs() {
         try {
-          // Get all logs from all users
           const combinedLogs: OrganizedLogEntry[] = [];
 
           for (const friendId of allUserIds) {
-            const userDocRef = doc(db, "users", friendId);
-            const userDoc = await getDoc(userDocRef);
-
-            if (userDoc.exists()) {
-              const userData = userDoc.data() as UserData;
-              const logs = userData.logs || [];
-
+            const cachedUserData = userDataCache.get(friendId);
+            if (cachedUserData) {
+              const logs = cachedUserData.logs || [];
               const userLogs = logs
                 .filter((log) => validateLogEntry(log))
                 .map((log) => ({
-                  user: userData.name || friendId,
+                  user: cachedUserData.name || friendId,
                   dateTimeStr: log.dateTimeStr,
                   duration: log.duration,
                   tags: log.tags,
                   description: log.description || null,
                 }));
-
               combinedLogs.push(...userLogs);
             }
           }
 
-          // Sort by date (newest first)
           combinedLogs.sort((a, b) =>
             compareDates(a.dateTimeStr, b.dateTimeStr)
           );
-
           onUpdate(combinedLogs);
         } catch (error) {
           if (error instanceof Error) {
@@ -205,12 +235,11 @@ export const subscribeToFriendsLogs = (
     }
   };
 
-  // Start the process
   getFriendsAndSubscribe();
 
-  // Return a function to unsubscribe from all subscriptions
   return () => {
     unsubscribeFunctions.forEach((unsubscribe) => unsubscribe());
+    userDataCache.clear();
   };
 };
 
@@ -300,6 +329,3 @@ export const updateUserPresence = async (
     throw error;
   }
 };
-
-// Helper function for setDoc (would need to import from firebase/firestore)
-// declare const setDoc: any;

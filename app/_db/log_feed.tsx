@@ -1,12 +1,4 @@
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  DocumentSnapshot,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db, isConfigured } from "../firebase";
 import {
   UserLogData,

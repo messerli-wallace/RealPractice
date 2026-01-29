@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
+import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
   js.configs.recommended,
@@ -33,7 +34,12 @@ export default [
     settings: {
       react: { version: "detect" },
     },
+    plugins: {
+      "react-hooks": reactHooks,
+    },
     rules: {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",

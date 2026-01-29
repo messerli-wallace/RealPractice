@@ -9,13 +9,16 @@ export function toString(dateTime: Date | string): string {
     dateObj = new Date();
   }
 
-  const year = dateObj.getUTCFullYear();
-  const month = (dateObj.getUTCMonth() + 1).toString().padStart(2, "0");
-  const day = dateObj.getUTCDate().toString().padStart(2, "0");
-  const hour = dateObj.getUTCHours().toString().padStart(2, "0");
-  const minute = dateObj.getUTCMinutes().toString().padStart(2, "0");
+  const year = dateObj.getFullYear();
+  const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
+  const day = dateObj.getDate().toString().padStart(2, "0");
+  const hour = dateObj.getHours().toString().padStart(2, "0");
+  const minute = dateObj.getMinutes().toString().padStart(2, "0");
+  const timezoneOffset = -dateObj.getTimezoneOffset();
+  const offsetHours = Math.abs(Math.floor(timezoneOffset / 60));
+  const offsetSign = timezoneOffset >= 0 ? "+" : "-";
 
-  return `${year}-${month}-${day}-${hour}-${minute}`;
+  return `${month}-${day}-${year}-${hour}-${minute}-GMT${offsetSign}${offsetHours}`;
 }
 
 export function toReadableString(
@@ -60,8 +63,9 @@ export function toReadableString(
 export function fromString(dateTimeStr: string): Date {
   const parts = dateTimeStr.split("-");
   if (parts.length >= 5) {
-    const [year, month, day, hour, minute] = parts.map(Number);
-    const date = new Date(Date.UTC(year, month - 1, day, hour, minute));
+    // Format: MM-DD-YYYY-HH-MM-GMT+N (or other timezone info)
+    const [month, day, year, hour, minute] = parts.slice(0, 5).map(Number);
+    const date = new Date(year, month - 1, day, hour, minute);
     return date;
   }
   return new Date();
