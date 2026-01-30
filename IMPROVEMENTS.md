@@ -42,12 +42,16 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 - **Location:** `app/_db/newDataModel.ts:205` has TODO comment
 - **Fix:** Commit fully to new model, create migration script for existing data
 
-### 5. Type Duplication
+### 5. Type Duplication ✅ FIXED
 
 - **Issue:** `Log` interface in `LogsContext.tsx` duplicates `OrganizedLogEntry` from `types/index.ts`
 - **Impact:** Maintenance burden, potential drift between definitions
 - **Location:** `app/context/LogsContext.tsx:16-22`
 - **Fix:** Consolidate to single type definition, export from `types/index.ts`
+  - Removed local `Log` interface from `LogsContext.tsx`
+  - Updated all references to use `OrganizedLogEntry` from `types/index.ts`
+  - Deleted duplicate `types.ts` file from root (was not imported anywhere)
+- **Date Fixed:** 2026-01-29
 
 ### 6. Missing DateTime String Generation in CreateLogForm ✅ FIXED
 
@@ -211,13 +215,14 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 - ~~Broken pagination in LogsContext.tsx (loadMoreLogs was empty)~~ (2026-01-29)
 - ~~N+1 query problem in realtimeService.ts friends feed~~ (2026-01-29)
 - ~~Add React Hooks ESLint rules to eslint.config.mjs~~ (2026-01-29)
+- ~~Consolidate duplicate type definitions (Log interface vs OrganizedLogEntry)~~ (2026-01-29)
 
 ---
 
 ## Quick Wins (Low Effort, High Impact)
 
 1. ~~Fix ESLint configuration (add React Hooks rules)~~ ✅ DONE
-2. Consolidate duplicate type definitions
+2. ~~Consolidate duplicate type definitions~~ ✅ DONE
 3. Add basic tests for database operations
 4. Fix datetime string format alignment
 5. Remove unused `any` types

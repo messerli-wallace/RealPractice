@@ -13,23 +13,15 @@ import { OrganizedLogEntry } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
 import { UserAuth } from "./AuthContext";
 
-interface Log {
-  user: string;
-  dateTimeStr: string;
-  duration: string;
-  tags: string[];
-  description: string | null;
-}
-
 interface LogsContextType {
-  logs: Log[];
-  allLogs: Log[];
+  logs: OrganizedLogEntry[];
+  allLogs: OrganizedLogEntry[];
   loading: boolean;
   error: Error | null;
   hasMore: boolean;
   page: number;
   refreshLogs: () => Promise<void>;
-  addLog: (log: Log) => void;
+  addLog: (log: OrganizedLogEntry) => void;
   loadMoreLogs: () => Promise<void>;
   tagFilter: string;
   setTagFilter: (value: string) => void;
@@ -54,8 +46,8 @@ export const LogsContextProvider = ({
   enableRealtime = true,
 }: LogsContextProviderProps) => {
   const { user: authUser } = UserAuth();
-  const [allLogs, setAllLogs] = useState<Log[]>([]);
-  const [logs, setLogs] = useState<Log[]>([]);
+  const [allLogs, setAllLogs] = useState<OrganizedLogEntry[]>([]);
+  const [logs, setLogs] = useState<OrganizedLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [hasMore, setHasMore] = useState(true);
@@ -199,7 +191,7 @@ export const LogsContextProvider = ({
     }
   };
 
-  const addLog = (log: Log) => {
+  const addLog = (log: OrganizedLogEntry) => {
     setAllLogs((prevLogs) => [log, ...prevLogs]);
   };
 
