@@ -7,7 +7,7 @@
     "start": "next start",
     "prepare": "husky install",
     "build:firebase": "rm -rf .next out && npm run build",
-    "deploy:firebase": "npm run build:firebase && firebase deploy --only hosting",
+    "deploy:firebase": "npm run build:firebase && firebase deploy",
     "lint": "eslint --cache .",
     "format": "prettier --write .",
     "lint:fix": "eslint --cache . --fix",
