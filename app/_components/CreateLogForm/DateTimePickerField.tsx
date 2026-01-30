@@ -29,7 +29,7 @@ export function DateTimePickerField({
     <div className="space-y-2">
       <FormField label="Date and time" error={error}>
         <div
-          className={`border rounded-lg p-3 flex gap-2 overflow-hidden ${error ? "border-red-300 bg-red-50" : "border-gray-200"}`}
+          className={`border-2 rounded-lg p-2 sm:p-3 flex gap-2 overflow-hidden ${error ? "border-red-300 bg-red-50" : "border-gray-200"}`}
         >
           <div className="flex-1 min-w-0">
             <ReactDatePicker
