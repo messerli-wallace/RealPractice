@@ -35,7 +35,7 @@ export function CreateLogForm({
     description: "",
     duration: "",
     datetime: new Date(),
-    tags: ["other"],
+    tags: [],
   },
   className = "",
 }: CreateLogFormProps) {
@@ -90,7 +90,7 @@ export function CreateLogForm({
 
         setDescription("");
         setDuration("");
-        setTags(["other"]);
+        setTags([]);
         setOtherTag("");
         changeDatetime(new Date());
       }
