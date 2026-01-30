@@ -95,7 +95,7 @@ export function TagSelector({
                   onChange={handleOtherInputChange}
                   placeholder="Enter custom tag"
                   maxLength={50}
-                  className="flex-1 border-2 border-blue-500 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
+                  className="flex-1 min-w-0 max-w-full border-2 border-blue-500 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm"
                   onBlur={onBlur}
                 />
               )}
