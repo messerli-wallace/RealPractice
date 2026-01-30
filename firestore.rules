@@ -1,117 +1,28 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ============================================
-    // USERS COLLECTION SECURITY RULES
-    // ============================================
     match /users/{userId} {
-      // --------------------------------------------
-      // READ RULES
-      // --------------------------------------------
       allow read: if request.auth != null;
 
-      // --------------------------------------------
-      // CREATE RULES
-      // --------------------------------------------
       allow create: if (
         request.auth != null &&
-        request.auth.uid == userId &&
-        isValidUserData(request.resource.data)
+        request.auth.uid == userId
       );
 
-      // --------------------------------------------
-      // UPDATE RULES
-      // --------------------------------------------
       allow update: if (
         request.auth != null &&
-        request.auth.uid == userId &&
-        isValidUserUpdate(request.resource.data)
+        request.auth.uid == userId
       );
 
-      // --------------------------------------------
-      // DELETE RULES
-      // --------------------------------------------
       allow delete: if (
         request.auth != null &&
         request.auth.uid == userId
       );
 
-      // --------------------------------------------
-      // LIST RULES
-      // --------------------------------------------
       allow list: if (
         request.auth != null &&
         request.query.limit <= 50
       );
-    }
-
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
-
-    // Check if current user is friends with target user
-    // Note: request.auth must be passed as param since it's not available in function scope
-    function isFriend(targetUserId, authUid) {
-      return exists(/databases/$(database)/documents/users/$(authUid)) &&
-             targetUserId in get(/databases/$(database)/documents/users/$(authUid)).data.friends;
-    }
-
-    // Validate user data structure and content
-    function isValidUserData(data) {
-      // Basic structure validation
-      return data.keys().hasAll(['name']) &&
-             data.name is string &&
-             data.name.size() > 0 &&
-             data.name.size() <= 50 &&
-             // Validate logs if present
-             (data.logs == null || isValidLogsArray(data.logs)) &&
-             // Validate friends if present
-             (data.friends == null || isValidFriendsArray(data.friends)) &&
-             // No sensitive fields allowed
-             !data.keys().hasAny(['password', 'email', 'phone', 'address', 'ssn']);
-    }
-
-    // Validate user update data
-    function isValidUserUpdate(data) {
-      // Prevent changing user ID
-      return !data.keys().hasAny(['__name__']) &&
-             // Validate name if being updated
-             (data.name == null || (data.name is string && data.name.size() > 0 && data.name.size() <= 50)) &&
-             // Validate logs if being updated
-             (data.logs == null || isValidLogsArray(data.logs)) &&
-             // Validate friends if being updated
-             (data.friends == null || isValidFriendsArray(data.friends)) &&
-             // No sensitive fields allowed
-             !data.keys().hasAny(['password', 'email', 'phone', 'address', 'ssn']);
-    }
-
-    // Validate logs array
-    function isValidLogsArray(logs) {
-      return logs is list &&
-             logs.size() <= 1000 &&
-             logs.all(logItem, isValidLogItem(logItem));
-    }
-
-    // Validate individual log item
-    function isValidLogItem(log) {
-      return log is map &&
-             log.keys().hasAll(['dateTimeStr', 'duration', 'description', 'tags']) &&
-             log.dateTimeStr is string &&
-             log.dateTimeStr.size() > 0 &&
-             log.duration is string &&
-             log.duration.size() > 0 &&
-             log.description is string &&
-             log.description.size() <= 1000 &&
-             log.tags is list &&
-             log.tags.size() <= 20 &&
-             log.tags.all(tagItem, tagItem is string && tagItem.size() <= 30);
-    }
-
-    // Validate friends array
-    function isValidFriendsArray(friends) {
-      return friends is list &&
-             friends.size() <= 500 &&
-             friends.all(friendItem, friendItem is string && friendItem.size() > 0 && friendItem.size() <= 50);
     }
   }
 }
