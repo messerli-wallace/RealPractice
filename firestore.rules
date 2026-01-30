@@ -35,6 +35,14 @@ service cloud.firestore {
         request.auth != null &&
         request.auth.uid == userId
       );
+
+      // --------------------------------------------
+      // LIST RULES
+      // --------------------------------------------
+      allow list: if (
+        request.auth != null &&
+        request.query.limit <= 50
+      );
     }
 
     // ============================================
@@ -42,9 +50,10 @@ service cloud.firestore {
     // ============================================
 
     // Check if current user is friends with target user
-    function isFriend(targetUserId) {
-      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.friends.hasAny([targetUserId]);
+    // Note: request.auth must be passed as param since it's not available in function scope
+    function isFriend(targetUserId, authUid) {
+      return exists(/databases/$(database)/documents/users/$(authUid)) &&
+             targetUserId in get(/databases/$(database)/documents/users/$(authUid)).data.friends;
     }
 
     // Validate user data structure and content
@@ -80,7 +89,7 @@ service cloud.firestore {
     function isValidLogsArray(logs) {
       return logs is list &&
              logs.size() <= 1000 &&
-             logs.all(log, isValidLogItem(log));
+             logs.all(logItem, isValidLogItem(logItem));
     }
 
     // Validate individual log item
@@ -95,25 +104,14 @@ service cloud.firestore {
              log.description.size() <= 1000 &&
              log.tags is list &&
              log.tags.size() <= 20 &&
-             log.tags.all(tag, tag is string && tag.size() <= 30);
+             log.tags.all(tagItem, tagItem is string && tagItem.size() <= 30);
     }
 
     // Validate friends array
     function isValidFriendsArray(friends) {
       return friends is list &&
              friends.size() <= 500 &&
-             friends.all(friend, friend is string && friend.size() > 0 && friend.size() <= 50);
-    }
-
-    // ============================================
-    // QUERY LIMITATIONS
-    // ============================================
-    // Prevent large collection queries that could cause performance issues
-    match /users/{userId} {
-      allow list: if (
-        request.auth != null &&
-        request.query.limit <= 50
-      );
+             friends.all(friendItem, friendItem is string && friendItem.size() > 0 && friendItem.size() <= 50);
     }
   }
 }
