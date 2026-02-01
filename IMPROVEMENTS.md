@@ -4,25 +4,6 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 ---
 
-## Testing (Critical Gap)
-
-### 7. Expand Test Coverage
-
-**Current State:** 6 test files exist (validation, database operations, error logger, AuthContext, UIContext, LogsContext)
-
-**Still Missing Tests:**
-
-- Context providers (all done - AuthContext, UIContext, and LogsContext are complete)
-- Real-time service (`realtimeService.ts`)
-- Components (`CreateLogForm`, `Log`, `like-button`, etc.)
-
-**Priority Order:**
-
-1. Context providers (state management)
-2. Key user-facing components
-
----
-
 ## Config & Tooling
 
 ### 9. Remove `any` Types
