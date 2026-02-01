@@ -319,3 +319,39 @@ export const getFriends = async (
     throw error;
   }
 };
+
+export const getUserById = async (
+  userId: string,
+  retryCount = 0
+): Promise<UserData | null> => {
+  /**
+   * Returns user data for a given user ID
+   * Returns null if user document doesn't exist
+   */
+  try {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+
+    const validatedData = validateUserData(data);
+    return validatedData;
+  } catch (error) {
+    // Log the error with context
+    if (error instanceof Error) {
+      logError("Failed to get user by ID", error, {
+        component: "db",
+        function: "getUserById",
+        metadata: { userId, retryCount },
+      });
+    }
+
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      return getUserById(userId, retryCount + 1);
+    }
+    throw error;
+  }
+};
