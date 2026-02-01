@@ -97,9 +97,16 @@ export const advancedFuzzySearchUsers = async (
   limitCount: number = 20,
   retryCount = 0
 ): Promise<SearchResultItem[]> => {
-  if (!isConfigured || !searchTerm || searchTerm.length < 2) {
+  if (!isConfigured) {
+    console.error("Firebase not configured - cannot search users");
+    throw new Error("Firebase not configured");
+  }
+
+  if (!searchTerm || searchTerm.trim().length === 0) {
     return [];
   }
+
+  const trimmedSearchTerm = searchTerm.trim();
 
   try {
     const db = getDb();
@@ -117,7 +124,7 @@ export const advancedFuzzySearchUsers = async (
       // Client-side fuzzy matching
       if (
         typeof userName === "string" &&
-        userName.toLowerCase().includes(searchTerm.toLowerCase())
+        userName.toLowerCase().includes(trimmedSearchTerm.toLowerCase())
       ) {
         const searchItem: SearchResultItem = {
           id: doc.id,
@@ -137,7 +144,7 @@ export const advancedFuzzySearchUsers = async (
       .sort((a, b) => {
         const aName = a.name.toLowerCase();
         const bName = b.name.toLowerCase();
-        const searchLower = searchTerm.toLowerCase();
+        const searchLower = trimmedSearchTerm.toLowerCase();
 
         const aExact = aName === searchLower;
         const bExact = bName === searchLower;
@@ -163,7 +170,7 @@ export const advancedFuzzySearchUsers = async (
       logError("Failed to perform advanced fuzzy search", error, {
         component: "searchService",
         function: "advancedFuzzySearchUsers",
-        metadata: { searchTerm, limitCount, retryCount },
+        metadata: { searchTerm: trimmedSearchTerm, limitCount, retryCount },
       });
     }
 

@@ -34,7 +34,9 @@ const SearchPage: React.FC = () => {
       setError(null);
 
       if (activeTab === "basic") {
+        console.log("Starting search for:", searchTerm);
         const results = await globalSearch(searchTerm, 20);
+        console.log("Search results:", results);
         setSearchResults(results);
       } else {
         // Advanced search with criteria
