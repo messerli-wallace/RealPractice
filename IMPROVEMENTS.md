@@ -8,20 +8,18 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 ### 7. Expand Test Coverage
 
-**Current State:** 2 test files exist (validation, database operations)
+**Current State:** 3 test files exist (validation, database operations, error logger)
 
 **Still Missing Tests:**
 
 - Context providers (`AuthContext`, `LogsContext`, `UIContext`)
 - Real-time service (`realtimeService.ts`)
-- Error logger (`errorLogger.ts`)
 - Components (`CreateLogForm`, `Log`, `like-button`, etc.)
 
 **Priority Order:**
 
 1. Context providers (state management)
-2. Error logging (reliability)
-3. Key user-facing components
+2. Key user-facing components
 
 ---
 
