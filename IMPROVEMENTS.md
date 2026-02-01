@@ -67,11 +67,17 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 ### 7. Expand Test Coverage
 
-**Current State:** Only 1 test file exists (`__tests__/utils/validation.test.ts`)
+**Current State:** 2 test files exist
 
-**Missing Tests:**
+- `__tests__/utils/validation.test.ts` - Validation utilities ✅
+- `__tests__/db/db.test.ts` - Database operations ✅
 
-- Database operations (`db.ts`, `newDataModel.ts`)
+**Completed:**
+
+- ✅ Database operations tests added (22 tests covering CRUD operations, retry logic, network error handling)
+
+**Still Missing Tests:**
+
 - Context providers (`AuthContext`, `LogsContext`, `UIContext`)
 - Real-time service (`realtimeService.ts`)
 - Error logger (`errorLogger.ts`)
@@ -79,7 +85,7 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 **Priority Order:**
 
-1. Database operations (core functionality)
+1. ~~Database operations (core functionality)~~ ✅ DONE
 2. Context providers (state management)
 3. Error logging (reliability)
 4. Key user-facing components
@@ -225,6 +231,7 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 - ~~N+1 query problem in realtimeService.ts friends feed~~ (2026-01-29)
 - ~~Add React Hooks ESLint rules to eslint.config.mjs~~ (2026-01-29)
 - ~~Consolidate duplicate type definitions (Log interface vs OrganizedLogEntry)~~ (2026-01-29)
+- ~~Add basic tests for database operations~~ (2026-01-29)
 
 ---
 
@@ -235,7 +242,7 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 3. ~~Add Prettier integration with ESLint~~ ✅ DONE
 4. ~~Fix datetime string format alignment~~ ✅ DONE (fixed in dateUtils.ts)
 5. ~~Remove unused `any` types~~ ✅ DONE (no `any` types in source code, only in build output)
-6. Add basic tests for database operations
+6. ~~Add basic tests for database operations~~ ✅ DONE (added 22 tests for db.ts)
 
 ---
 
