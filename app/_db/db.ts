@@ -242,3 +242,80 @@ export const docExists = async (
     throw error;
   }
 };
+
+// Friend/Following functions
+
+export const followUser = async (
+  currentUserId: string,
+  targetUserId: string,
+  retryCount = 0
+): Promise<void> => {
+  /**
+   * Adds targetUserId to currentUser's friends array
+   * Uses arrayUnion to prevent duplicates
+   */
+  try {
+    const docRef = doc(db, "users", currentUserId);
+    await updateDoc(docRef, {
+      friends: arrayUnion(targetUserId),
+    });
+  } catch (error) {
+    // Log the error with context
+    if (error instanceof Error) {
+      logError("Failed to follow user", error, {
+        component: "db",
+        function: "followUser",
+        metadata: { currentUserId, targetUserId, retryCount },
+      });
+    }
+
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      await followUser(currentUserId, targetUserId, retryCount + 1);
+    } else {
+      throw error;
+    }
+  }
+};
+
+export const getFriends = async (
+  userId: string,
+  retryCount = 0
+): Promise<string[]> => {
+  /**
+   * Returns the friends array for a given user
+   * Returns empty array if user has no friends or document doesn't exist
+   */
+  try {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+
+    const validatedData = validateUserData(data);
+    if (validatedData) {
+      return validatedData.friends || [];
+    }
+    return [];
+  } catch (error) {
+    // Log the error with context
+    if (error instanceof Error) {
+      logError("Failed to get friends", error, {
+        component: "db",
+        function: "getFriends",
+        metadata: { userId, retryCount },
+      });
+    }
+
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      return getFriends(userId, retryCount + 1);
+    }
+    throw error;
+  }
+};

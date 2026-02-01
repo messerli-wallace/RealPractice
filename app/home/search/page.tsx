@@ -1,15 +1,20 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import {
   advancedFuzzySearchUsers,
   globalSearch,
   searchLogsByCriteria,
 } from "../../_db/searchService";
+import { followUser, getFriends } from "../../_db/db";
 import { SearchResultItem } from "../../../types/index";
 import { logError } from "../../../lib/utils/errorLogger";
 import { Input, Button, Card, Alert } from "../../_components/DesignSystem";
+import { FollowButton } from "../../_components/FollowButton";
+import { UserAuth } from "../../context/AuthContext";
 
 const SearchPage: React.FC = () => {
+  const { user: currentUser } = UserAuth();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState<string>("");
@@ -22,6 +27,55 @@ const SearchPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
+  const [friends, setFriends] = useState<string[]>([]);
+
+  // Load friends list when current user is available
+  useEffect(() => {
+    const loadFriends = async () => {
+      if (currentUser?.uid) {
+        try {
+          const friendsList = await getFriends(currentUser.uid);
+          setFriends(friendsList);
+        } catch (error) {
+          logError(
+            "Failed to load friends list",
+            error instanceof Error ? error : new Error("Unknown error"),
+            {
+              component: "search",
+              function: "loadFriends",
+              metadata: { userId: currentUser.uid },
+            }
+          );
+          // Don't set error state here - we can still search without friends list
+        }
+      }
+    };
+
+    loadFriends();
+  }, [currentUser?.uid]);
+
+  const handleFollowUser = async (targetUserId: string) => {
+    if (!currentUser?.uid) {
+      setError("You must be logged in to follow users");
+      return;
+    }
+
+    try {
+      await followUser(currentUser.uid, targetUserId);
+      // Update local state to reflect the follow
+      setFriends((prev) => [...prev, targetUserId]);
+    } catch (error) {
+      if (error instanceof Error) {
+        logError("Failed to follow user from search page", error, {
+          component: "search",
+          function: "handleFollowUser",
+          metadata: { currentUserId: currentUser.uid, targetUserId },
+        });
+        setError("Failed to follow user. Please try again.");
+      }
+      throw error;
+    }
+  };
 
   const handleSearch = async () => {
     if (activeTab === "basic" && !searchTerm.trim()) {
@@ -254,23 +308,36 @@ const SearchPage: React.FC = () => {
                 <p className="text-gray-500">No users found</p>
               </Card>
             ) : (
-              searchResults.users.map((user) => (
-                <Card key={user.id} className="mb-3 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <h3 className="font-medium">{user.name}</h3>
-                      {user.description && (
-                        <p className="text-sm text-gray-600">
-                          {user.description}
-                        </p>
+              searchResults.users.map((user) => {
+                const isCurrentUser = currentUser?.uid === user.id;
+                const isFollowing = friends.includes(user.id);
+
+                return (
+                  <Card key={user.id} className="mb-3 p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium">{user.name}</h3>
+                        {user.description && (
+                          <p className="text-sm text-gray-600">
+                            {user.description}
+                          </p>
+                        )}
+                      </div>
+                      {!isCurrentUser && (
+                        <FollowButton
+                          targetUserId={user.id}
+                          isFollowing={isFollowing}
+                          onFollow={() => handleFollowUser(user.id)}
+                          size="sm"
+                        />
                       )}
                     </div>
-                  </div>
-                </Card>
-              ))
+                  </Card>
+                );
+              })
             )}
           </div>
 
