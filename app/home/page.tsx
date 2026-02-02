@@ -43,7 +43,10 @@ export default function Home() {
   );
 
   return (
-    <div className="container mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
+    <div
+      className="container mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8"
+      style={{ paddingTop: "4rem" }}
+    >
       <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Home</h1>
 
       {error && (
