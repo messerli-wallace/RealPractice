@@ -45,7 +45,7 @@ export const LogsContextProvider = ({
   children,
   enableRealtime = true,
 }: LogsContextProviderProps) => {
-  const { user: authUser } = UserAuth();
+  const { user: authUser, isLoading: authLoading } = UserAuth();
   const [allLogs, setAllLogs] = useState<OrganizedLogEntry[]>([]);
   const [logs, setLogs] = useState<OrganizedLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,7 +60,8 @@ export const LogsContextProvider = ({
   const userId = authUser?.uid || "";
   const currentUserName = authUser?.displayName || "";
 
-  if (!userId && enableRealtime) {
+  // Only show warning if user is not authenticated AND we've waited for auth state to settle
+  if (!userId && enableRealtime && !authLoading) {
     console.warn("No authenticated user found - logs will not load");
   }
 

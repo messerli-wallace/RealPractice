@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { UserAuth } from "../context/AuthContext";
+import "../globals.css";
 
 const Navbar = () => {
   const { user, googleSignIn, logOut, isGoogleSignInLoading, isLogOutLoading } =
@@ -43,68 +44,62 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="w-full px-3 sm:px-4 lg:px-8">
-        <div className="flex justify-between items-center h-14 sm:h-16">
+      <div className="w-full px-3 lg:px-8">
+        <div className="flex justify-between items-center h-16">
           {/* Left side - Logo and Navigation links */}
-          <div className="flex items-center space-x-1 sm:space-x-2">
-            <div className="flex items-center space-x-2 pr-3 sm:pr-6">
-              <div className="w-7 sm:w-8 h-7 sm:h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                  />
-                </svg>
+          <div className="flex items-center space-x-1">
+            <Link href="/">
+              <div className="flex items-center space-x-2 pr-6 cursor-pointer">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                    />
+                  </svg>
+                </div>
+                <span className="font-bold text-lg text-gray-900">
+                  RealPractice
+                </span>
               </div>
-              <span className="font-bold text-base sm:text-lg text-gray-900">
-                RealPractice
-              </span>
-            </div>
+            </Link>
             <Link
               href="/"
-              className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+              className="px-2 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-all"
             >
               Home
             </Link>
             <Link
               href="/home/search"
-              className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all hidden sm:block"
+              className="px-2 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-all hidden"
             >
               Search
             </Link>
-            {user && (
-              <Link
-                href="/home/profile"
-                className="px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all hidden sm:block"
-              >
-                Profile
-              </Link>
-            )}
           </div>
 
           {/* Right side - Auth buttons */}
           {!loading && (
-            <div className="flex items-center space-x-1 sm:space-x-2">
+            <div className="flex items-center space-x-1">
               {!user ? (
                 <>
                   <button
                     onClick={handleSignIn}
                     disabled={isGoogleSignInLoading}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 text-xs font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isGoogleSignInLoading ? "Loading..." : "Login"}
                   </button>
                   <button
                     onClick={handleSignIn}
                     disabled={isGoogleSignInLoading}
-                    className="px-4 sm:px-5 py-1.5 sm:py-2.5 text-xs sm:text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 text-xs font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isGoogleSignInLoading ? (
                       <span className="flex items-center justify-center">
@@ -136,28 +131,30 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200">
-                    <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                      <svg
-                        className="w-3.5 h-3.5 text-white"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                  <Link href="/home/profile">
+                    <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
+                      <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-3.5 h-3.5 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">
+                        {user.displayName}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {user.displayName}
-                    </span>
-                  </div>
+                  </Link>
                   <button
                     onClick={logOut}
                     disabled={isLogOutLoading}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 text-xs font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 rounded md:px-4 md:py-2 md:text-sm"
                   >
                     {isLogOutLoading ? "Signing out..." : "Sign Out"}
                   </button>

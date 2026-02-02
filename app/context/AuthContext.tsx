@@ -21,6 +21,7 @@ interface AuthContextType {
   user: FirebaseUser | null;
   isGoogleSignInLoading: boolean;
   isLogOutLoading: boolean;
+  isLoading: boolean;
   googleSignIn: () => Promise<void>;
   logOut: () => Promise<void>;
 }
@@ -35,6 +36,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [isGoogleSignInLoading, setIsGoogleSignInLoading] = useState(false);
   const [isLogOutLoading, setIsLogOutLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const googleSignIn = async () => {
     if (!isConfigured || !auth) {
@@ -67,7 +69,9 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     if (!isConfigured || !auth) {
       return;
     }
+    setIsLoading(true);
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setIsLoading(false);
       setUser(currentUser);
       if (currentUser !== null) {
         docExists(currentUser.uid, currentUser);
@@ -82,6 +86,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         user,
         isGoogleSignInLoading,
         isLogOutLoading,
+        isLoading,
         googleSignIn,
         logOut,
       }}
