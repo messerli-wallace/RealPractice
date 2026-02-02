@@ -14,38 +14,58 @@ interface LogProps {
 
 export const Log: React.FC<LogProps> = ({ log }) => {
   return (
-    <div className="log">
-      <div className="flex justify-between items-start mb-2">
-        <h2 className="text-lg sm:text-xl font-semibold">Log</h2>
-        <LikeButton logId={log.index?.toString()} />
+    <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-4">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold text-white">Practice Log</h2>
+          <LikeButton logId={log.index?.toString()} />
+        </div>
       </div>
-      <p className="text-sm sm:text-base">
-        <strong>Index:</strong> {log.index}
-      </p>
-      <p className="text-sm sm:text-base">
-        <strong>User:</strong> {log.user}
-      </p>
-      <p className="text-sm sm:text-base">
-        <strong>Date:</strong> {log.dateTimeStr}
-      </p>
-      <p className="text-sm sm:text-base">
-        <strong>Duration:</strong> {log.duration}
-      </p>
-      <p className="text-sm sm:text-base flex flex-wrap gap-1">
-        <strong>Tags:</strong>{" "}
-        {log.tags.map((tag, idx) => (
-          <span
-            key={idx}
-            className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-xs sm:text-sm"
-          >
-            {tag}
-          </span>
-        ))}
-      </p>
-      <p className="text-sm sm:text-base mt-2 break-words">
-        <strong>Description:</strong>{" "}
-        {log.description || "No description available"}
-      </p>
+      <div className="p-6 space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">
+              User
+            </p>
+            <p className="text-sm font-medium text-gray-800">{log.user}</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-xs text-gray-500 uppercase tracking-wide">
+              Duration
+            </p>
+            <p className="text-sm font-medium text-gray-800">{log.duration}</p>
+          </div>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+            Date & Time
+          </p>
+          <p className="text-sm text-gray-800">{log.dateTimeStr}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
+            Tags
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {log.tags.map((tag, idx) => (
+              <span
+                key={idx}
+                className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
+            Description
+          </p>
+          <p className="text-sm text-gray-700 leading-relaxed break-words bg-gray-50 rounded-lg p-3 border-l-4 border-indigo-500">
+            {log.description || "No description provided"}
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

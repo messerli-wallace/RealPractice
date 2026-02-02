@@ -66,9 +66,7 @@ export default function CreateLog() {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-yellow-700">
-                      You must be logged in to add a log.
-                    </p>
+                    <p className="text-yellow-700">Sign in to add a log.</p>
                   </div>
                 </div>
               </div>
