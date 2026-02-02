@@ -23,11 +23,10 @@ export interface UserData {
 export interface LogItem {
   id?: string;
   userId?: string;
-  dateTimeStr: string;
   duration: string;
   description: string;
   tags: string[];
-  createdAt?: string;
+  createdAt: string;
   updatedAt?: string;
   location?: string;
   mood?: string;
@@ -38,11 +37,10 @@ export interface LogItem {
  * Log entry structure (similar to LogItem but with null description)
  */
 export interface LogEntry {
-  dateTimeStr: string;
   duration: string;
   tags: string[];
   description: string | null;
-  createdAt?: string;
+  createdAt: string;
   updatedAt?: string;
   location?: string;
   mood?: string;
@@ -61,7 +59,7 @@ export interface UserLogData {
  */
 export interface OrganizedLogEntry {
   user: string;
-  dateTimeStr: string;
+  createdAt: string;
   duration: string;
   tags: string[];
   description: string | null;
@@ -167,12 +165,10 @@ export function isLogItem(obj: unknown): obj is LogItem {
   if (typeof obj !== "object" || obj === null) return false;
   const logItem = obj as LogItem;
   return (
-    typeof logItem.dateTimeStr === "string" &&
+    typeof logItem.createdAt === "string" &&
     typeof logItem.duration === "string" &&
     typeof logItem.description === "string" &&
     Array.isArray(logItem.tags) &&
-    (logItem.createdAt === undefined ||
-      typeof logItem.createdAt === "string") &&
     (logItem.updatedAt === undefined ||
       typeof logItem.updatedAt === "string") &&
     (logItem.location === undefined || typeof logItem.location === "string") &&
@@ -186,13 +182,11 @@ export function isLogEntry(obj: unknown): obj is LogEntry {
   if (typeof obj !== "object" || obj === null) return false;
   const logEntry = obj as LogEntry;
   return (
-    typeof logEntry.dateTimeStr === "string" &&
+    typeof logEntry.createdAt === "string" &&
     typeof logEntry.duration === "string" &&
     Array.isArray(logEntry.tags) &&
     (logEntry.description === null ||
       typeof logEntry.description === "string") &&
-    (logEntry.createdAt === undefined ||
-      typeof logEntry.createdAt === "string") &&
     (logEntry.updatedAt === undefined ||
       typeof logEntry.updatedAt === "string") &&
     (logEntry.location === undefined ||

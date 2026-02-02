@@ -126,10 +126,10 @@ function organizeAndSortData(userData: UserLogData[]): OrganizedLogEntry[] {
     user[userName].forEach((activity: LogEntry) => {
       // Validate each log entry before processing
       if (validateLogEntry(activity)) {
-        const { dateTimeStr, duration, tags, description } = activity;
+        const { createdAt, duration, tags, description } = activity;
         organizedData.push({
           user: userName,
-          dateTimeStr,
+          createdAt,
           duration,
           tags,
           description,
@@ -140,9 +140,9 @@ function organizeAndSortData(userData: UserLogData[]): OrganizedLogEntry[] {
     });
   });
 
-  // Sort the organized data by dateTimeStr
+  // Sort the organized data by createdAt (ISO 8601 format)
   organizedData.sort((a, b) => {
-    return Number(a.dateTimeStr) - Number(b.dateTimeStr);
+    return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
   });
 
   return organizedData;

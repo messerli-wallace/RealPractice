@@ -19,7 +19,7 @@ export default function CreateLog() {
         const logItem: LogItem = {
           id: crypto.randomUUID(),
           ...data,
-          createdAt: Date.now().toString(),
+          createdAt: new Date().toISOString(),
         };
         await addLog(logPath, logItem);
       }

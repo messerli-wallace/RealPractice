@@ -231,7 +231,7 @@ describe("Database Operations", () => {
   describe("addLog", () => {
     const mockDocPath = "user123";
     const mockLog = {
-      dateTimeStr: "01-15-2026-10-30-GMT+0",
+      createdAt: "2026-01-15T10:30:00.000Z",
       duration: "30",
       description: "Practiced guitar",
       tags: ["guitar"],
@@ -272,7 +272,7 @@ describe("Database Operations", () => {
   describe("removeLog", () => {
     const mockDocPath = "user123";
     const mockLog = {
-      dateTimeStr: "01-15-2026-10-30-GMT+0",
+      createdAt: "2026-01-15T10:30:00.000Z",
       duration: "30",
       description: "Practiced guitar",
       tags: ["guitar"],

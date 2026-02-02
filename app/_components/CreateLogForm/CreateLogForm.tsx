@@ -1,21 +1,14 @@
 import { useState } from "react";
 import styles from "./CreateLogForm.module.css";
-import { LogFormData, LogFormErrors, DateTimeValue } from "./types";
+import { LogFormData, LogFormErrors } from "./types";
 import {
   validateLogEntry,
   validateDuration,
   validateDescription,
   validateTags,
 } from "../../../lib/utils/validation";
-import { toString } from "../../../lib/utils/dateUtils";
 import { Alert } from "../DesignSystem";
-import {
-  DateTimePickerField,
-  DurationInput,
-  DescriptionInput,
-  TagSelector,
-  SubmitButton,
-} from ".";
+import { DurationInput, DescriptionInput, TagSelector, SubmitButton } from ".";
 
 export interface CreateLogFormProps {
   onSubmit: (data: LogFormData) => Promise<void>;
@@ -23,7 +16,6 @@ export interface CreateLogFormProps {
   initialData?: {
     description: string;
     duration: string;
-    datetime: DateTimeValue;
     tags: string[];
   };
   className?: string;
@@ -35,16 +27,12 @@ export function CreateLogForm({
   initialData = {
     description: "",
     duration: "",
-    datetime: new Date(),
     tags: [],
   },
   className = "",
 }: CreateLogFormProps) {
   const [description, setDescription] = useState(initialData.description);
   const [duration, setDuration] = useState(initialData.duration);
-  const [datetime, changeDatetime] = useState<DateTimeValue>(
-    initialData.datetime
-  );
   const [tags, setTags] = useState(initialData.tags);
   const [otherTag, setOtherTag] = useState("");
   const [errors, setErrors] = useState<LogFormErrors>({});
@@ -54,18 +42,11 @@ export function CreateLogForm({
     e.preventDefault();
     setErrors({});
 
-    const dateTimeStr = toString(
-      Array.isArray(datetime)
-        ? datetime[0] || new Date()
-        : datetime || new Date()
-    );
-
     const processedTags = tags.map((tag) =>
       tag === "other" && otherTag ? otherTag : tag
     );
 
     const ticket: LogFormData = {
-      dateTimeStr,
       duration,
       description,
       tags: processedTags,
@@ -93,7 +74,6 @@ export function CreateLogForm({
         setDuration("");
         setTags([]);
         setOtherTag("");
-        changeDatetime(new Date());
       }
     } catch (error) {
       let errorMessage = "Failed to submit log. Please try again.";
@@ -196,11 +176,6 @@ export function CreateLogForm({
       )}
 
       <div className={styles.formGrid}>
-        <DateTimePickerField
-          value={datetime}
-          onChange={changeDatetime}
-          error={errors.dateTimeStr}
-        />
         <DurationInput
           value={duration}
           onChange={(value) => {

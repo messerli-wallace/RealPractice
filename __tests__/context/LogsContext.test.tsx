@@ -26,21 +26,21 @@ const mockLogs: OrganizedLogEntry[] = [
   {
     user: "Test User",
     duration: "30",
-    dateTimeStr: "01-15-2024-10-00-GMT-5",
+    createdAt: "2024-01-15T15:00:00.000Z",
     description: "Practice session 1",
     tags: ["guitar", "practice"],
   },
   {
     user: "Other User",
     duration: "45",
-    dateTimeStr: "01-15-2024-14-00-GMT-5",
+    createdAt: "2024-01-15T19:00:00.000Z",
     description: "Practice session 2",
     tags: ["piano", "warmup"],
   },
   {
     user: "Test User",
     duration: "60",
-    dateTimeStr: "01-16-2024-09-00-GMT-5",
+    createdAt: "2024-01-16T14:00:00.000Z",
     description: "Practice session 3",
     tags: ["guitar", "scales"],
   },
@@ -249,7 +249,7 @@ describe("LogsContext", () => {
       const manyLogs = Array.from({ length: 15 }, (_, i) => ({
         user: "Test User",
         duration: "30",
-        dateTimeStr: `01-${i + 1}-2024-10-00-GMT-5`,
+        createdAt: `2024-01-${String(i + 1).padStart(2, "0")}T15:00:00.000Z`,
         description: `Practice session ${i}`,
         tags: ["guitar"],
       }));

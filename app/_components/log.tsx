@@ -1,11 +1,12 @@
 import React from "react";
 import LikeButton from "./like-button";
 import styles from "./Log.module.css";
+import { toReadableString } from "../../lib/utils/dateUtils";
 
 interface LogProps {
   log: {
     user: string;
-    dateTimeStr: string;
+    createdAt: string;
     duration: string;
     tags: string[];
     description: string | null;
@@ -35,7 +36,7 @@ export const Log: React.FC<LogProps> = ({ log }) => {
         </div>
         <div className={styles.sectionSpacing}>
           <p className={`${styles.logLabel} ${styles.mb1}`}>Date & Time</p>
-          <p className={styles.logValue}>{log.dateTimeStr}</p>
+          <p className={styles.logValue}>{toReadableString(log.createdAt)}</p>
         </div>
         <div className={styles.sectionSpacing}>
           <p className={`${styles.logLabel} ${styles.mb2}`}>Tags</p>

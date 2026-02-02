@@ -157,7 +157,6 @@ export function validateName(name: string): {
  * Validates a complete log entry
  */
 export function validateLogEntry(log: {
-  dateTimeStr: string;
   duration: string;
   description: string;
   tags: string[];
@@ -165,18 +164,12 @@ export function validateLogEntry(log: {
   valid: boolean;
   errors: Record<string, string>;
   sanitized?: {
-    dateTimeStr: string;
     duration: string;
     description: string;
     tags: string[];
   };
 } {
   const errors: Record<string, string> = {};
-
-  // Validate datetime
-  if (!log.dateTimeStr || log.dateTimeStr.trim() === "") {
-    errors.dateTimeStr = "Date and time are required";
-  }
 
   // Validate duration
   const durationValidation = validateDuration(log.duration);
@@ -204,7 +197,6 @@ export function validateLogEntry(log: {
     valid: true,
     errors: {},
     sanitized: {
-      dateTimeStr: log.dateTimeStr,
       duration: durationValidation.sanitized,
       description: descriptionValidation.sanitized,
       tags: tagsValidation.sanitized,

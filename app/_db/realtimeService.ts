@@ -7,13 +7,10 @@ import {
   Unsubscribe,
 } from "firebase/firestore";
 import { db, isConfigured } from "../firebase";
-import {
-  UserData,
-  OrganizedLogEntry,
-  validateLogEntry,
-} from "../../types/index";
+import { UserData, OrganizedLogEntry } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
 import { compareDates } from "../../lib/utils/dateUtils";
+import { extractLogFromFirebase } from "../../lib/utils/firebaseDataUtils";
 
 function getDb(): Firestore {
   if (!isConfigured || !db) {
@@ -49,18 +46,17 @@ export const subscribeToUserLogs = (
           const logs = userData.logs || [];
 
           const organizedLogs: OrganizedLogEntry[] = logs
-            .filter((log) => validateLogEntry(log))
+            .map((log) => extractLogFromFirebase(log))
+            .filter((log): log is NonNullable<typeof log> => log !== null)
             .map((log) => ({
               user: userData.name || userId,
-              dateTimeStr: log.dateTimeStr,
+              createdAt: log.createdAt,
               duration: log.duration,
               tags: log.tags,
-              description: log.description || null,
+              description: log.description,
             }));
 
-          organizedLogs.sort((a, b) =>
-            compareDates(a.dateTimeStr, b.dateTimeStr)
-          );
+          organizedLogs.sort((a, b) => compareDates(a.createdAt, b.createdAt));
 
           onUpdate(organizedLogs);
         } else {
@@ -196,21 +192,20 @@ export const subscribeToFriendsLogs = (
             if (cachedUserData) {
               const logs = cachedUserData.logs || [];
               const userLogs = logs
-                .filter((log) => validateLogEntry(log))
+                .map((log) => extractLogFromFirebase(log))
+                .filter((log): log is NonNullable<typeof log> => log !== null)
                 .map((log) => ({
                   user: cachedUserData.name || friendId,
-                  dateTimeStr: log.dateTimeStr,
+                  createdAt: log.createdAt,
                   duration: log.duration,
                   tags: log.tags,
-                  description: log.description || null,
+                  description: log.description,
                 }));
               combinedLogs.push(...userLogs);
             }
           }
 
-          combinedLogs.sort((a, b) =>
-            compareDates(a.dateTimeStr, b.dateTimeStr)
-          );
+          combinedLogs.sort((a, b) => compareDates(a.createdAt, b.createdAt));
           onUpdate(combinedLogs);
         } catch (error) {
           if (error instanceof Error) {

@@ -1,7 +1,6 @@
 import React from "react";
 
 export interface LogFormData {
-  dateTimeStr: string;
   duration: string;
   description: string;
   tags: string[];
@@ -13,10 +12,7 @@ export interface LogFormErrors {
   duration?: string;
   description?: string;
   tags?: string;
-  dateTimeStr?: string;
 }
-
-export type DateTimeValue = Date | null | [Date | null, Date | null];
 
 export interface LogFormProps {
   onSubmit: (data: LogFormData) => Promise<void>;
@@ -29,12 +25,6 @@ export interface FormFieldProps {
   required?: boolean;
   children: React.ReactNode;
   className?: string;
-}
-
-export interface DateTimePickerProps {
-  value: DateTimeValue;
-  onChange: (value: DateTimeValue) => void;
-  error?: string;
 }
 
 export interface DurationInputProps {

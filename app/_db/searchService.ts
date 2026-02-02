@@ -222,9 +222,9 @@ export const searchLogsByCriteria = async (
         const matchesDateRange =
           !criteria.startDate ||
           !criteria.endDate ||
-          (log.dateTimeStr &&
-            log.dateTimeStr >= criteria.startDate &&
-            log.dateTimeStr <= criteria.endDate);
+          (log.createdAt &&
+            log.createdAt >= criteria.startDate &&
+            log.createdAt <= criteria.endDate);
 
         const matchesDuration =
           (!criteria.minDuration && !criteria.maxDuration) ||
