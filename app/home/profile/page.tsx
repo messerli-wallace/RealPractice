@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import styles from "./page.module.css";
 import { UserAuth } from "../../context/AuthContext";
 import LoadingImage from "../../_components/LoadingGif";
 import { getFriends, getUserById } from "../../_db/db";
@@ -13,7 +14,7 @@ interface FriendWithData {
 }
 
 const ProfilePage = () => {
-  const { user } = UserAuth(); //user data if logged in
+  const { user } = UserAuth();
   const [loading, setLoading] = useState(true);
   const [friends, setFriends] = useState<FriendWithData[]>([]);
   const [friendsLoading, setFriendsLoading] = useState(false);
@@ -27,7 +28,6 @@ const ProfilePage = () => {
     checkAuthentication();
   }, [user]);
 
-  // Load friends list when user is available
   useEffect(() => {
     const loadFriends = async () => {
       if (user?.uid) {
@@ -36,7 +36,6 @@ const ProfilePage = () => {
         try {
           const friendIds = await getFriends(user.uid);
 
-          // Fetch user data for each friend
           const friendsData = await Promise.all(
             friendIds.map(async (friendId) => {
               try {
@@ -79,24 +78,24 @@ const ProfilePage = () => {
   }, [user?.uid]);
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div className={styles.container}>
       {loading ? (
         <LoadingImage />
       ) : user ? (
-        <div className="space-y-6">
+        <div className={styles.spaceY6}>
           {/* User info */}
           <div>
-            <p className="text-base sm:text-lg">Welcome, {user.displayName}</p>
+            <p className={styles.welcome}>Welcome, {user.displayName}</p>
           </div>
 
           {/* Following Section */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">
+            <h2 className={styles.sectionTitle}>
               Following ({friends.length})
             </h2>
 
             {error && (
-              <div className="mb-4">
+              <div className={styles.errorContainer}>
                 <Alert variant="error" title="Error">
                   {error}
                 </Alert>
@@ -104,37 +103,35 @@ const ProfilePage = () => {
             )}
 
             {friendsLoading ? (
-              <div className="flex justify-center py-8">
+              <div className={styles.loadingContainer}>
                 <LoadingImage />
               </div>
             ) : friends.length === 0 ? (
-              <Card className="p-6 text-center">
-                <p className="text-gray-500">
+              <Card className={styles.emptyCard}>
+                <p className={styles.emptyText}>
                   You are not following anyone yet.
                 </p>
-                <p className="text-sm text-gray-400 mt-2">
+                <p className={styles.helpText}>
                   Use the search page to find and follow users.
                 </p>
               </Card>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className={styles.friendsGrid}>
                 {friends.map((friend) => (
-                  <Card key={friend.id} className="p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold flex-shrink-0">
+                  <Card key={friend.id} className={styles.friendCard}>
+                    <div className={styles.friendContent}>
+                      <div className={styles.friendAvatar}>
                         {(friend.data?.name || "?").charAt(0).toUpperCase()}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium truncate">
+                      <div className={styles.friendInfo}>
+                        <h3 className={styles.friendName}>
                           {friend.data?.name || "Unknown User"}
                         </h3>
                         {friend.data?.bio && (
-                          <p className="text-sm text-gray-600 truncate">
-                            {friend.data.bio}
-                          </p>
+                          <p className={styles.friendBio}>{friend.data.bio}</p>
                         )}
                         {!friend.data && (
-                          <p className="text-xs text-gray-400">
+                          <p className={styles.unavailableText}>
                             User data unavailable
                           </p>
                         )}
@@ -147,8 +144,8 @@ const ProfilePage = () => {
           </div>
         </div>
       ) : (
-        <div className="px-4 py-6 sm:py-8">
-          <p className="text-sm sm:text-base">
+        <div className={styles.notLoggedIn}>
+          <p className={styles.notLoggedInText}>
             You must be logged in to view this page - protected route.
           </p>
         </div>

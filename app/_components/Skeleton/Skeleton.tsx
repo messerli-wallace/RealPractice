@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import styles from "./Skeleton.module.css";
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   width?: string | number;
@@ -17,7 +18,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 }) => {
   return (
     <div
-      className={`skeleton ${className}`}
+      className={`${styles.skeleton} ${className}`}
       style={{
         width,
         height,

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import styles from "./CreateLogForm.module.css";
 import { LogFormData, LogFormErrors, DateTimeValue } from "./types";
 import {
   validateLogEntry,
@@ -180,10 +181,10 @@ export function CreateLogForm({
     <form
       onSubmit={handleSubmit}
       id="createLog"
-      className={`create-log-form ${className}`}
+      className={`${styles.createLogForm} ${className}`}
     >
       {errors.form && (
-        <div className="mb-3 sm:mb-4">
+        <div className={styles.mb4}>
           <Alert
             variant={errors.success ? "success" : "error"}
             title={errors.success ? "Success" : "Error"}
@@ -194,7 +195,7 @@ export function CreateLogForm({
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+      <div className={styles.formGrid}>
         <DateTimePickerField
           value={datetime}
           onChange={changeDatetime}
@@ -235,9 +236,12 @@ export function CreateLogForm({
         onOtherTagChange={setOtherTag}
       />
 
-      <div className="mt-8 flex justify-end">
+      <div className={styles.formActions}>
         <SubmitButton isLoading={isLoading} className="px-8 py-3 text-lg" />
       </div>
     </form>
   );
 }
+
+// Export styles for composition
+export { styles as createLogFormStyles };

@@ -1,5 +1,6 @@
 "use client";
 import React, { useRef, useCallback, useState } from "react";
+import styles from "./page.module.css";
 import CreateLog from "../_components/CreateLog";
 import Log from "../_components/log";
 import { FilterBar } from "../_components/FilterBar";
@@ -43,34 +44,31 @@ export default function Home() {
   );
 
   return (
-    <div
-      className="container mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8"
-      style={{ paddingTop: "4rem" }}
-    >
-      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Home</h1>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Home</h1>
 
       {error && (
-        <div className="mb-4">
+        <div className={styles.mb4}>
           <Alert variant="error" title="Error loading logs">
             {error.message}
           </Alert>
         </div>
       )}
 
-      <div className="mb-6 sm:mb-8">
+      <div className={styles.mb6}>
         {!showCreateLog ? (
           <button
             onClick={() => setShowCreateLog(true)}
-            className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+            className={styles.newLogButton}
           >
             New Log
           </button>
         ) : (
-          <div className="overflow-hidden transition-all duration-500 ease-in-out">
-            <div className="flex justify-between items-center mb-4">
+          <div className={styles.createLogWrapper}>
+            <div className={styles.createLogHeader}>
               <button
                 onClick={() => setShowCreateLog(false)}
-                className="text-gray-600 hover:text-gray-800 font-medium"
+                className={styles.cancelButton}
               >
                 Cancel
               </button>
@@ -93,14 +91,12 @@ export default function Home() {
       />
 
       <div>
-        <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-          Recent Logs
-        </h2>
+        <h2 className={styles.sectionTitle}>Recent Logs</h2>
 
         {loading && logs.length === 0 ? (
           <SkeletonCard count={3} />
         ) : logs.length === 0 ? (
-          <p className="text-gray-500 text-sm sm:text-base">
+          <p className={styles.emptyMessage}>
             No logs found. Create your first log!
           </p>
         ) : (
@@ -111,15 +107,13 @@ export default function Home() {
               </React.Fragment>
             ))}
             {loading && hasMore && (
-              <div className="py-3 sm:py-4">
+              <div className={styles.loadingContainer}>
                 <SkeletonCard count={1} />
               </div>
             )}
             {!hasMore && (
-              <div className="flex justify-center py-3 sm:py-4">
-                <p className="text-gray-400 text-xs sm:text-sm">
-                  You&apos;ve reached the end!
-                </p>
+              <div className={styles.endMessage}>
+                <p>You&apos;ve reached the end!</p>
               </div>
             )}
             <div ref={lastLogElementRef} />

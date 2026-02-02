@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { UserAuth } from "../context/AuthContext";
-import "../globals.css";
-import "./Navbar.css";
+import styles from "./Navbar.module.css";
 
 const Navbar = () => {
   const { user, googleSignIn, logOut, isGoogleSignInLoading, isLogOutLoading } =
@@ -12,7 +11,6 @@ const Navbar = () => {
     try {
       await googleSignIn();
     } catch (error) {
-      // Enhanced error handling for authentication
       let errorMessage = "Failed to sign in. Please try again.";
 
       if (error instanceof Error) {
@@ -28,11 +26,10 @@ const Navbar = () => {
         }
       }
 
-      // Show user-friendly error
       alert(errorMessage);
     }
   };
-  // console.log(user);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,20 +41,15 @@ const Navbar = () => {
   }, [user]);
 
   return (
-    <nav className="navbar">
-      <div className="w-full px-3 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className={styles.navbar}>
+      <div className={styles.navbarContainer}>
+        <div className={styles.navbarContent}>
           {/* Left side - Logo and Navigation links */}
-          <div className="flex items-center space-x-0.5">
+          <div className={styles.leftSection}>
             <Link href="/">
-              <div className="flex items-center space-x-1 pr-2 cursor-pointer">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
+              <div className={styles.logoLink}>
+                <div className={styles.logoIcon}>
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -66,51 +58,52 @@ const Navbar = () => {
                     />
                   </svg>
                 </div>
-                <span className="font-bold text-lg text-gray-900">
-                  RealPractice
-                </span>
+                <span className={styles.logoText}>RealPractice</span>
               </div>
             </Link>
             <Link
               href="/"
-              className="py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-all hidden"
+              className={`${styles.navLink} ${styles.navLinkHidden}`}
             >
               Home
             </Link>
-            <Link
-              href="/home/search"
-              className="py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded transition-all"
-            >
+            <Link href="/home/search" className={styles.navLink}>
               Search
             </Link>
           </div>
 
           {/* Right side - Auth buttons */}
           {!loading && (
-            <div className="flex items-center space-x-1">
+            <div className={styles.rightSection}>
               {!user ? (
                 <>
                   <button
                     onClick={handleSignIn}
                     disabled={isGoogleSignInLoading}
-                    className="px-3 py-1 text-xs font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={styles.authButton}
                   >
                     {isGoogleSignInLoading ? "Loading..." : "Login"}
                   </button>
                   <button
                     onClick={handleSignIn}
                     disabled={isGoogleSignInLoading}
-                    className="px-4 py-2 text-xs font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className={styles.signUpButton}
                   >
                     {isGoogleSignInLoading ? (
-                      <span className="flex items-center justify-center">
+                      <span
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
                         <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          className={styles.spinner}
                           fill="none"
                           viewBox="0 0 24 24"
                         >
                           <circle
-                            className="opacity-25"
+                            className={styles.spinnerCircle}
                             cx="12"
                             cy="12"
                             r="10"
@@ -118,7 +111,7 @@ const Navbar = () => {
                             strokeWidth="4"
                           />
                           <path
-                            className="opacity-75"
+                            className={styles.spinnerPath}
                             fill="currentColor"
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           />
@@ -133,13 +126,9 @@ const Navbar = () => {
               ) : (
                 <>
                   <Link href="/home/profile">
-                    <div className="flex items-center space-x-2 px-3 py-1.5 bg-gray-50 rounded-full border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors">
-                      <div className="w-6 h-6 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                        <svg
-                          className="w-3.5 h-3.5 text-white"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
+                    <div className={styles.userProfile}>
+                      <div className={styles.userAvatar}>
+                        <svg fill="currentColor" viewBox="0 0 20 20">
                           <path
                             fillRule="evenodd"
                             d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
@@ -147,7 +136,7 @@ const Navbar = () => {
                           />
                         </svg>
                       </div>
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className={styles.userName}>
                         {user.displayName}
                       </span>
                     </div>
@@ -155,7 +144,7 @@ const Navbar = () => {
                   <button
                     onClick={logOut}
                     disabled={isLogOutLoading}
-                    className="px-3 py-1 text-xs font-medium text-gray-700 border border-gray-200 hover:bg-gray-100 rounded md:px-4 md:py-2 md:text-sm"
+                    className={styles.signOutButton}
                   >
                     {isLogOutLoading ? "Signing out..." : "Sign Out"}
                   </button>

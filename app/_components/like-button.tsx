@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import styles from "./LikeButton.module.css";
 
 interface LikeButtonProps {
   initialLikes?: number;
   logId?: string;
 }
 
-export default function LikeButton({
-  initialLikes = 0,
-  //logId,
-}: LikeButtonProps) {
+export default function LikeButton({ initialLikes = 0 }: LikeButtonProps) {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(initialLikes);
 
@@ -23,12 +21,12 @@ export default function LikeButton({
     <button
       type="button"
       onClick={handleLikeClick}
-      className="flex items-center gap-1 text-sm text-gray-600 hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+      className={styles.likeButton}
       aria-label={liked ? "Unlike this log" : "Like this log"}
       aria-pressed={liked}
     >
       <svg
-        className={`w-5 h-5 ${liked ? "fill-red-500 text-red-500" : "text-gray-400"}`}
+        className={`${styles.heartIcon} ${liked ? styles.heartLiked : styles.heartNotLiked}`}
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
       >
@@ -48,7 +46,7 @@ export default function LikeButton({
           />
         )}
       </svg>
-      <span>{likeCount}</span>
+      <span className={styles.count}>{likeCount}</span>
     </button>
   );
 }

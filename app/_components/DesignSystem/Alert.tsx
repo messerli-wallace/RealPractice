@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./Alert.module.css";
 
 export interface AlertProps {
   variant?: "success" | "error" | "warning" | "info";
@@ -15,29 +16,36 @@ export function Alert({
   onClose,
   className = "",
 }: AlertProps) {
+  const variantClass =
+    styles[`alert${variant.charAt(0).toUpperCase() + variant.slice(1)}`];
+
+  const icons = {
+    success: "✓",
+    error: "✗",
+    warning: "⚠",
+    info: "ℹ",
+  };
+
   return (
     <div
-      className={`p-4 rounded-md bg-${variant}-100 text-${variant}-800 border border-${variant}-200 ${className}`}
+      className={`${styles.alert} ${variantClass} ${className}`}
       role="alert"
     >
-      <div className="flex justify-between items-start">
-        <div className="flex-1">
+      <div className={styles.alertContent}>
+        <div className={styles.alertBody}>
           {title && (
-            <h3 className="font-medium mb-1">
-              {variant === "success" && <span className="mr-2">✓</span>}
-              {variant === "error" && <span className="mr-2">✗</span>}
-              {variant === "warning" && <span className="mr-2">⚠</span>}
-              {variant === "info" && <span className="mr-2">ℹ</span>}
+            <h3 className={styles.alertTitle}>
+              <span className={styles.icon}>{icons[variant]}</span>
               {title}
             </h3>
           )}
-          <div className="text-sm">{children}</div>
+          <div className={styles.alertMessage}>{children}</div>
         </div>
 
         {onClose && (
           <button
             onClick={onClose}
-            className="ml-4 text-xl font-bold hover:opacity-70 transition-opacity"
+            className={styles.alertClose}
             aria-label="Close alert"
           >
             ×
@@ -47,3 +55,6 @@ export function Alert({
     </div>
   );
 }
+
+// Export styles for composition
+export { styles as alertStyles };

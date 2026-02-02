@@ -1,0 +1,86 @@
+:root {
+  --alert-success-bg: #dcfce7;
+  --alert-success-text: #166534;
+  --alert-success-border: #86efac;
+  --alert-error-bg: #fee2e2;
+  --alert-error-text: #991b1b;
+  --alert-error-border: #fca5a5;
+  --alert-warning-bg: #fef9c3;
+  --alert-warning-text: #854d0e;
+  --alert-warning-border: #fde047;
+  --alert-info-bg: #dbeafe;
+  --alert-info-text: #1e40af;
+  --alert-info-border: #93c5fd;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid;
+  transition: all var(--transition-base);
+}
+
+.alertContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.alertBody {
+  flex: 1;
+}
+
+.alertTitle {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.alertMessage {
+  font-size: 0.875rem;
+}
+
+.alertClose {
+  margin-left: 1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: opacity var(--transition-base);
+}
+
+.alertClose:hover {
+  opacity: 0.7;
+}
+
+/* Variants using CSS custom properties */
+.alertSuccess {
+  background-color: var(--alert-success-bg);
+  color: var(--alert-success-text);
+  border-color: var(--alert-success-border);
+}
+
+.alertError {
+  background-color: var(--alert-error-bg);
+  color: var(--alert-error-text);
+  border-color: var(--alert-error-border);
+}
+
+.alertWarning {
+  background-color: var(--alert-warning-bg);
+  color: var(--alert-warning-text);
+  border-color: var(--alert-warning-border);
+}
+
+.alertInfo {
+  background-color: var(--alert-info-bg);
+  color: var(--alert-info-text);
+  border-color: var(--alert-info-border);
+}
+
+/* Icon spacing */
+.icon {
+  margin-right: 0.5rem;
+}

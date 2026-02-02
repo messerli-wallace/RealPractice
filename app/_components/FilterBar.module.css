@@ -1,0 +1,90 @@
+.filterBar {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: var(--color-bg);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border);
+}
+
+.filterHeader {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .filterHeader {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.filterTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.clearButton {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.clearButton:hover {
+  color: var(--color-secondary);
+}
+
+@media (min-width: 640px) {
+  .clearButton {
+    margin-top: 0;
+  }
+}
+
+.filterGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .filterGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.checkboxContainer {
+  margin-top: 0.75rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.checkboxText {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}

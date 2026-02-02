@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./Card.module.css";
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "default" | "elevated" | "bordered";
@@ -13,9 +14,11 @@ export function Card({
   ...props
 }: CardProps) {
   const classes = [
-    "card",
-    `card-${variant}`,
-    padding !== "none" ? `p-${padding}` : "",
+    styles.card,
+    styles[`card${variant.charAt(0).toUpperCase() + variant.slice(1)}`],
+    padding !== "none"
+      ? styles[`padding${padding.charAt(0).toUpperCase() + padding.slice(1)}`]
+      : "",
     className,
   ]
     .filter(Boolean)
@@ -27,3 +30,6 @@ export function Card({
     </div>
   );
 }
+
+// Export styles for composition
+export { styles as cardStyles };

@@ -1,0 +1,156 @@
+.container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 5rem 0.75rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .container {
+    padding: 5rem 1rem 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 5rem 2rem 2rem;
+  }
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+@media (min-width: 640px) {
+  .title {
+    font-size: 1.875rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.mb4 {
+  margin-bottom: 1rem;
+}
+
+.mb6 {
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .mb6 {
+    margin-bottom: 2rem;
+  }
+}
+
+.newLogButton {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.newLogButton:hover {
+  background-color: var(--color-primary-dark, #1d4ed8);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 640px) {
+  .newLogButton {
+    width: auto;
+  }
+}
+
+.createLogWrapper {
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+}
+
+.createLogHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.cancelButton {
+  color: var(--color-text-secondary);
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out;
+}
+
+.cancelButton:hover {
+  color: var(--color-text);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--color-text);
+}
+
+@media (min-width: 640px) {
+  .sectionTitle {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.loadingContainer {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .loadingContainer {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+.endMessage {
+  display: flex;
+  justify-content: center;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .endMessage {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+}
+
+.endMessage p {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .endMessage p {
+    font-size: 0.875rem;
+  }
+}
+
+.emptyMessage {
+  color: var(--color-text-secondary);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .emptyMessage {
+    font-size: 1rem;
+  }
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./CreateLogForm.module.css";
 import { FormFieldProps } from "./types";
 
 export function FormField({
@@ -9,15 +10,13 @@ export function FormField({
   className = "",
 }: FormFieldProps & { className?: string }) {
   return (
-    <div className={`form-field mb-6 ${className}`}>
-      <label className="block mb-3">
-        <span className="text-sm font-medium text-gray-700">
-          {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
-        </span>
-        {children}
+    <div className={`${styles.formField} ${className}`}>
+      <label className={styles.formFieldLabel}>
+        {label}
+        {required && <span className={styles.required}>*</span>}
       </label>
-      {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+      {children}
+      {error && <div className={styles.errorMessage}>{error}</div>}
     </div>
   );
 }

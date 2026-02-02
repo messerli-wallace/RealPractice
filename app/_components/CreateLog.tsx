@@ -6,6 +6,7 @@ import { logError, createComponentContext } from "../../lib/utils/errorLogger";
 import { LogItem } from "../../types/index";
 import { CreateLogForm } from "./CreateLogForm";
 import { LogFormData } from "./CreateLogForm/types";
+import styles from "./CreateLog.module.css";
 
 export default function CreateLog() {
   const errorContext = createComponentContext("CreateLog");
@@ -35,25 +36,22 @@ export default function CreateLog() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-          <div className="px-6 py-8 sm:p-10">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                New Practice Log
-              </h1>
-              <p className="text-gray-600">Record your practice session</p>
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
+            <div className={styles.header}>
+              <h1 className={styles.title}>New Practice Log</h1>
+              <p className={styles.subtitle}>Record your practice session</p>
             </div>
 
             {user ? (
-              <CreateLogForm onSubmit={handleSubmit} className="space-y-6" />
+              <CreateLogForm onSubmit={handleSubmit} />
             ) : (
-              <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
+              <div className={styles.warningBox}>
+                <div className={styles.warningContent}>
+                  <div className={styles.warningIcon}>
                     <svg
-                      className="h-5 w-5 text-yellow-400"
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 20 20"
                       fill="currentColor"
@@ -65,8 +63,10 @@ export default function CreateLog() {
                       />
                     </svg>
                   </div>
-                  <div className="ml-3">
-                    <p className="text-yellow-700">Sign in to add a log.</p>
+                  <div className={styles.warningText}>
+                    <p className={styles.warningMessage}>
+                      Sign in to add a log.
+                    </p>
                   </div>
                 </div>
               </div>

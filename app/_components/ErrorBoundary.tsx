@@ -1,6 +1,7 @@
 "use client";
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
+import styles from "./ErrorBoundary.module.css";
 import { logError } from "../../lib/utils/errorLogger";
 
 interface ErrorBoundaryProps {
@@ -25,12 +26,10 @@ export class ErrorBoundary extends Component<
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // Log the error to the centralized error logging system
     logError("ErrorBoundary caught an error", error, {
       component: "ErrorBoundary",
       metadata: {
@@ -40,7 +39,6 @@ export class ErrorBoundary extends Component<
       },
     });
 
-    // Call the optional error handler prop
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
@@ -48,23 +46,24 @@ export class ErrorBoundary extends Component<
 
   render(): ReactNode {
     if (this.state.hasError) {
-      // You can render any custom fallback UI
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
       return (
-        <div className="p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
-          <h2 className="text-lg font-bold mb-2">Something went wrong</h2>
-          <p className="mb-2">We apologize for the inconvenience.</p>
-          <p className="text-sm">
+        <div className={styles.errorBoundary}>
+          <h2 className={styles.errorTitle}>Something went wrong</h2>
+          <p className={styles.errorMessage}>
+            We apologize for the inconvenience.
+          </p>
+          <p className={styles.errorDetail}>
             {this.state.error && this.state.error.message && (
               <span>Error: {this.state.error.message}</span>
             )}
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
+            className={styles.reloadButton}
           >
             Reload Page
           </button>
@@ -76,7 +75,6 @@ export class ErrorBoundary extends Component<
   }
 }
 
-// Convenience wrapper for functional components
 export function withErrorBoundary<
   P extends Record<string, unknown> = Record<string, unknown>,
 >(

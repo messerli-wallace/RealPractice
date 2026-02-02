@@ -1,0 +1,35 @@
+.errorBoundary {
+  padding: 1rem;
+  background-color: #fef2f2;
+  border-left: 4px solid #ef4444;
+  color: #b91c1c;
+}
+
+.errorTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.errorMessage {
+  margin-bottom: 0.5rem;
+}
+
+.errorDetail {
+  font-size: 0.875rem;
+}
+
+.reloadButton {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reloadButton:hover {
+  background-color: #fecaca;
+}

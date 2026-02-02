@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import styles from "./page.module.css";
 import {
   advancedFuzzySearchUsers,
   globalSearch,
@@ -29,7 +30,6 @@ const SearchPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
   const [friends, setFriends] = useState<string[]>([]);
 
-  // Load friends list when current user is available
   useEffect(() => {
     const loadFriends = async () => {
       if (currentUser?.uid) {
@@ -46,7 +46,6 @@ const SearchPage: React.FC = () => {
               metadata: { userId: currentUser.uid },
             }
           );
-          // Don't set error state here - we can still search without friends list
         }
       }
     };
@@ -62,7 +61,6 @@ const SearchPage: React.FC = () => {
 
     try {
       await followUser(currentUser.uid, targetUserId);
-      // Update local state to reflect the follow
       setFriends((prev) => [...prev, targetUserId]);
     } catch (error) {
       if (error instanceof Error) {
@@ -88,12 +86,9 @@ const SearchPage: React.FC = () => {
       setError(null);
 
       if (activeTab === "basic") {
-        console.log("Starting search for:", searchTerm);
         const results = await globalSearch(searchTerm, 20);
-        console.log("Search results:", results);
         setSearchResults(results);
       } else {
-        // Advanced search with criteria
         const criteria: {
           searchText?: string;
           tags?: string[];
@@ -160,37 +155,37 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8">
-      <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Search</h1>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Search</h1>
 
-      <Card className="mb-4 sm:mb-6">
-        <div className="mb-3 sm:mb-4">
-          <div className="flex gap-2 mb-4">
+      <Card className={styles.mb4}>
+        <div className={styles.mb4}>
+          <div className={styles.tabContainer}>
             <Button
               variant={activeTab === "basic" ? "primary" : "secondary"}
               onClick={() => setActiveTab("basic")}
-              className="flex-1"
+              className={styles.tabButton}
             >
               Basic Search
             </Button>
             <Button
               variant={activeTab === "advanced" ? "primary" : "secondary"}
               onClick={() => setActiveTab("advanced")}
-              className="flex-1"
+              className={styles.tabButton}
             >
               Advanced Filters
             </Button>
           </div>
 
           {activeTab === "basic" ? (
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className={styles.searchInputContainer}>
               <Input
                 type="text"
                 placeholder="Search users, tags, or descriptions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="flex-1"
+                className={styles.searchInput}
               />
               <Button
                 onClick={handleSearch}
@@ -201,23 +196,20 @@ const SearchPage: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4 sm:space-y-4">
+            <div className={styles.spaceY4}>
               <Input
                 type="text"
                 placeholder="Search in descriptions and tags..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
+                className={styles.searchInput}
               />
 
-              <div>
-                <label
-                  htmlFor="tag-input"
-                  className="block text-sm font-medium text-gray-700 mb-1"
-                >
+              <div className={styles.tagsSection}>
+                <label htmlFor="tag-input" className={styles.tagsLabel}>
                   Tags
                 </label>
-                <div className="flex gap-2">
+                <div className={styles.tagsInputContainer}>
                   <Input
                     id="tag-input"
                     type="text"
@@ -225,23 +217,20 @@ const SearchPage: React.FC = () => {
                     value={tagInput}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addTag()}
-                    className="flex-1"
+                    className={styles.searchInput}
                   />
                   <Button onClick={addTag} size="sm">
                     Add
                   </Button>
                 </div>
                 {selectedTags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
+                  <div className={styles.tagsList}>
                     {selectedTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="flex items-center gap-1 px-2 sm:px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs sm:text-sm"
-                      >
+                      <span key={tag} className={styles.tag}>
                         {tag}
                         <button
                           onClick={() => removeTag(tag)}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
+                          className={styles.removeTagButton}
                           aria-label={`Remove ${tag} tag`}
                         >
                           ×
@@ -252,7 +241,7 @@ const SearchPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className={styles.durationGrid}>
                 <Input
                   type="number"
                   placeholder="Min duration (minutes)"
@@ -271,7 +260,7 @@ const SearchPage: React.FC = () => {
                 onClick={handleSearch}
                 disabled={isLoading}
                 isLoading={isLoading}
-                className="w-full"
+                className={styles.searchButton}
               >
                 {isLoading ? "Searching..." : "Search with Filters"}
               </Button>
@@ -282,14 +271,14 @@ const SearchPage: React.FC = () => {
         {activeTab === "basic" &&
           searchTerm.length > 0 &&
           searchTerm.length < 2 && (
-            <p className="text-xs sm:text-sm text-gray-500 mt-2">
+            <p className={styles.helpText}>
               Enter at least 2 characters for better results
             </p>
           )}
       </Card>
 
       {error && (
-        <div className="mb-3 sm:mb-4">
+        <div className={styles.mb4}>
           <Alert variant="error" title="Search Error">
             {error}
           </Alert>
@@ -297,15 +286,15 @@ const SearchPage: React.FC = () => {
       )}
 
       {searchResults && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className={styles.resultsGrid}>
           {/* Users Results */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">
+          <div className={styles.resultsColumn}>
+            <h2 className={styles.resultsTitle}>
               Users ({searchResults.users.length})
             </h2>
             {searchResults.users.length === 0 ? (
-              <Card className="p-4 text-center">
-                <p className="text-gray-500">No users found</p>
+              <Card className={styles.emptyCard}>
+                <p className={styles.emptyText}>No users found</p>
               </Card>
             ) : (
               searchResults.users.map((user) => {
@@ -313,15 +302,15 @@ const SearchPage: React.FC = () => {
                 const isFollowing = friends.includes(user.id);
 
                 return (
-                  <Card key={user.id} className="mb-3 p-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">
+                  <Card key={user.id} className={styles.userCard}>
+                    <div className={styles.userCardContent}>
+                      <div className={styles.userAvatar}>
                         {user.name.charAt(0).toUpperCase()}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium">{user.name}</h3>
+                      <div className={styles.userInfo}>
+                        <h3 className={styles.userName}>{user.name}</h3>
                         {user.description && (
-                          <p className="text-sm text-gray-600">
+                          <p className={styles.userDescription}>
                             {user.description}
                           </p>
                         )}
@@ -342,31 +331,26 @@ const SearchPage: React.FC = () => {
           </div>
 
           {/* Logs Results */}
-          <div>
-            <h2 className="text-xl font-semibold mb-4">
+          <div className={styles.resultsColumn}>
+            <h2 className={styles.resultsTitle}>
               Logs ({searchResults.logs.length})
             </h2>
             {searchResults.logs.length === 0 ? (
-              <Card className="p-4 text-center">
-                <p className="text-gray-500">No logs found</p>
+              <Card className={styles.emptyCard}>
+                <p className={styles.emptyText}>No logs found</p>
               </Card>
             ) : (
               searchResults.logs.map((log) => (
-                <Card key={log.id} className="mb-3 p-4">
+                <Card key={log.id} className={styles.logCard}>
                   <div>
-                    <h3 className="font-medium mb-1">{log.name}</h3>
+                    <h3 className={styles.logName}>{log.name}</h3>
                     {log.description && (
-                      <p className="text-sm text-gray-600 mb-2">
-                        {log.description}
-                      </p>
+                      <p className={styles.logDescription}>{log.description}</p>
                     )}
                     {log.tags && (
-                      <div className="flex flex-wrap gap-1">
+                      <div className={styles.tagsContainer}>
                         {log.tags.map((tag, index) => (
-                          <span
-                            key={index}
-                            className="px-2 py-1 bg-gray-100 text-xs rounded"
-                          >
+                          <span key={index} className={styles.logTag}>
                             {tag}
                           </span>
                         ))}
