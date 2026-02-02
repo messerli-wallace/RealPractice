@@ -13,6 +13,15 @@
     --color-text-secondary: #6b7280;
     --color-border: #e5e7eb;
     --color-border-light: #f3f4f6;
+    /* Alert/Warning colors */
+    --color-error-bg: #fee2e2;
+    --color-error-text: #991b1b;
+    --color-warning-bg: #fef9c3;
+    --color-warning-text: #854d0e;
+    --color-success-bg: #dcfce7;
+    --color-success-text: #166534;
+    --color-info-bg: #dbeafe;
+    --color-info-text: #1e40af;
     --spacing-base: 0.25rem;
     --font-sans:
       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
@@ -35,6 +44,15 @@
       --color-text-secondary: #d1d5db;
       --color-border: #374151;
       --color-border-light: #2d3748;
+      /* Dark mode alert colors */
+      --color-error-bg: #450a0a;
+      --color-error-text: #fca5a5;
+      --color-warning-bg: #422006;
+      --color-warning-text: #fde047;
+      --color-success-bg: #052e16;
+      --color-success-text: #86efac;
+      --color-info-bg: #172554;
+      --color-info-text: #93c5fd;
     }
   }
 
