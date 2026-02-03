@@ -4,25 +4,6 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 ---
 
-## ✅ Completed Improvements
-
-### 9. Remove `any` Types
-
-- **Status**: ✅ **COMPLETE (100%)**
-- **Evidence**: No `: any` or `as any` patterns found in codebase. TypeScript has `noImplicitAny: true` enabled. All error handling uses proper type guards with `instanceof Error`.
-
-### 21. Design System Polish
-
-- **Status**: ✅ **COMPLETE (100%)**
-- **Evidence**: Full design system exists in `app/_components/DesignSystem/` with Button, Input, Textarea, Card, Alert components. Consistent CSS modules, variants, sizes, loading states, and visual feedback.
-
-### 23. Follow/Unfollow
-
-- **Status**: ✅ **COMPLETE (100%)**
-- **Evidence**: Backend functions (`followUser()`) and UI component (`FollowButton.tsx`) fully implemented and integrated. Profile page shows following list.
-
----
-
 ## 🔴 Critical Priority (P0)
 
 ### 1. Implement API Routes (Next.js Serverless)
@@ -35,6 +16,7 @@ A prioritized list of improvements needed for the codebase, organized by impact 
   - Log operations
   - Social operations
 - **Estimated Effort**: 3-5 days
+- **Impact Score**: 10/10
 
 ### 2. Offline Write Queue
 
@@ -46,6 +28,20 @@ A prioritized list of improvements needed for the codebase, organized by impact 
   - Automatic retry with exponential backoff
   - Sync on connectivity restoration
 - **Estimated Effort**: 2-3 days
+- **Impact Score**: 9/10
+
+### 3. Security Scanning & App Check
+
+- **Issue**: No dependency scanning, Firebase App Check not configured
+- **Location**: `package.json`, Firebase configuration
+- **Impact**: Security vulnerabilities, potential abuse
+- **Fix**:
+  - Add `npm audit` and automated security scanning to CI/CD
+  - Implement Firebase App Check with reCAPTCHA
+  - Add rate limiting on API endpoints (once created)
+  - Enable Firebase Security Rules validation
+- **Estimated Effort**: 1-2 days
+- **Impact Score**: 9/10
 
 ---
 
@@ -61,6 +57,7 @@ A prioritized list of improvements needed for the codebase, organized by impact 
   - Log creation
   - Follow operations
 - **Estimated Effort**: 2-3 days
+- **Impact Score**: 7/10
 
 ### 5. Optimize Friends Feed Queries
 
@@ -72,6 +69,7 @@ A prioritized list of improvements needed for the codebase, organized by impact 
   - Implement proper compound queries
   - Reduce client-side filtering
 - **Estimated Effort**: 2-3 days
+- **Impact Score**: 8/10
 
 ### 6. Debouncing & Rate Limiting
 
@@ -79,115 +77,120 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 - **Location**: Search components, form submissions
 - **Impact**: Performance issues, potential abuse
 - **Fix**:
-  - Add debounce utility for search inputs
+  - Add debounce utility for search inputs (300-500ms)
   - Implement rate limiting for API calls
   - Add throttling for form submissions
 - **Estimated Effort**: 1 day
+- **Impact Score**: 6/10
 
-### 7. Security Scanning
+### 7. Data Validation & Error Handling
 
-- **Issue**: No dependency scanning, Firebase App Check not configured
-- **Location**: `package.json`, Firebase configuration
-- **Impact**: Security vulnerabilities
+- **Issue**: Incomplete validation coverage, inconsistent error handling patterns
+- **Location**: `types/index.ts`, form components, database operations
+- **Impact**: Data integrity issues, poor error recovery
 - **Fix**:
-  - Add `npm audit` and automated security scanning
-  - Implement Firebase App Check
-  - Add rate limiting on API endpoints
-- **Estimated Effort**: 1 day
+  - Complete validation logic for all form inputs
+  - Standardize error handling patterns across components
+  - Add input sanitization for security
+- **Estimated Effort**: 2-3 days
+- **Impact Score**: 7/10
 
 ---
 
 ## 🟡 Medium Priority (P2)
 
-### 8. Friend Request System
-
-- **Issue**: Backend functions exist but no friend request UI/accept/reject flow
-- **Location**: `app/_db/db.ts` (friends array), UI components
-- **Fix**:
-  - Build friend request UI
-  - Implement accept/reject flow
-  - Add pending requests tracking
-- **Estimated Effort**: 2 days
-
-### 9. User Profile Customization
+### 8. User Profile Customization
 
 - **Issue**: Profile page exists but no editing features
 - **Location**: `app/home/profile/page.tsx`
 - **Fix**:
-  - Profile picture upload
-  - Bio editing
-  - Theme customization
-  - Onboarding flow
+  - Profile picture upload with image compression
+  - Bio editing with character limits
+  - Theme customization (dark/light mode)
+  - Onboarding flow for new users
 - **Estimated Effort**: 3-5 days
+- **Impact Score**: 6/10
 
-### 10. Accessibility (a11y) Enhancement
+### 9. Accessibility (a11y) Enhancement
 
-- **Status**: ⚠️ PARTIALLY COMPLETE (40%)
-- **Current State**: ARIA attributes present, keyboard navigation basic, screen reader support partial
-- **Gap**: No full keyboard navigation testing, skip links, focus management
+- **Status**: ⚠️ PARTIALLY COMPLETE (35%)
+- **Current State**: Basic ARIA attributes present on interactive elements, limited keyboard navigation
+- **Gap**: No skip navigation links, incomplete focus management, missing screen reader announcements
 - **Fix**:
-  - Add comprehensive ARIA attributes
-  - Implement skip navigation links
-  - Add proper focus management
+  - Add skip navigation links for keyboard users
+  - Implement proper focus management (focus trapping in modals)
+  - Add live regions for dynamic content announcements
   - Full keyboard navigation testing
-  - Screen reader testing
+  - Screen reader compatibility testing (NVDA, VoiceOver)
+  - Color contrast verification (WCAG 2.1 AA)
 - **Estimated Effort**: 2-3 days
+- **Impact Score**: 5/10
 
 ---
 
 ## 🟢 Low Priority (P3)
 
-### 11. Enhanced Sorting Options
+### 10. Enhanced Sorting Options
 
-- **Status**: ⚠️ PARTIALLY COMPLETE (25%)
-- **Current State**: Basic date sorting exists
-- **Gap**: No date sort, duration sort, popularity sort
+- **Status**: ⚠️ PARTIALLY COMPLETE (33%)
+- **Current State**: Basic date sorting exists (newest first)
+- **Gap**: No duration sort, popularity sort, or multi-column sort
 - **Fix**:
-  - Add date-based sorting
-  - Add duration-based sorting
-  - Add popularity-based sorting (likes/comments)
-  - Implement sort dropdown UI
+  - Add duration-based sorting (shortest/longest first)
+  - Add popularity-based sorting (likes/comments count)
+  - Implement sort dropdown UI component
+  - Persist user sort preferences
 - **Estimated Effort**: 1 day
+- **Impact Score**: 4/10
 
-### 12. Testing Expansion
+### 11. Testing Expansion
 
-- **Status**: ✅ GOOD COVERAGE (80%)
-- **Current State**: 6 test files, ~1,463 lines tested, good coverage on db, contexts, utils
-- **Gap**: CSS module mapping issues, validation test mismatches, low coverage for types
+- **Status**: ✅ GOOD COVERAGE (75%)
+- **Current State**: 7 test files, ~2,432 lines tested
+  - Files: db tests, 3 context tests, Button component, errorLogger, validation
+  - Coverage: Statements 76%, Branches 53%, Functions 78%, Lines 75%
+- **Gap**: Low branch coverage (53%), missing component tests, limited type validation tests
 - **Fix**:
-  - Fix Jest CSS module configuration
-  - Update validation test logic
-  - Increase coverage for types/index.ts
-  - Add component test for Design System
-  - Expand database operation tests
+  - Increase branch coverage to 70%+ (currently 53%)
+  - Add component tests for Design System (Card, Input, Textarea, Alert)
+  - Expand validation test coverage for edge cases
+  - Add integration tests for critical user flows
+  - Add E2E tests for main user journeys
+- **Estimated Effort**: 3-4 days
+- **Impact Score**: 5/10
+
+### 12. Mobile Responsiveness Polish
+
+- **Issue**: Basic mobile support exists but needs refinement
+- **Location**: Various components
+- **Impact**: User experience on mobile devices
+- **Fix**:
+  - Optimize touch targets (min 44x44px)
+  - Improve mobile navigation patterns
+  - Add pull-to-refresh for feeds
+  - Optimize images for mobile bandwidth
 - **Estimated Effort**: 2-3 days
+- **Impact Score**: 4/10
 
 ---
 
-## 📊 Progress Summary
+## 📊 Quick Stats
 
-| Priority | Item                  | Status       | Effort   |
-| -------- | --------------------- | ------------ | -------- |
-| P0       | API Routes            | Not Started  | 3-5 days |
-| P0       | Offline Queue         | 40% Complete | 2-3 days |
-| P1       | Optimistic Updates    | Not Started  | 2-3 days |
-| P1       | Query Optimization    | 30% Complete | 2-3 days |
-| P1       | Debouncing/Rate Limit | Not Started  | 1 day    |
-| P1       | Security Scanning     | Not Started  | 1 day    |
-| P2       | Friend Requests       | 50% Complete | 2 days   |
-| P2       | Profile Customization | Not Started  | 3-5 days |
-| P2       | Accessibility         | 40% Complete | 2-3 days |
-| P3       | Sorting Options       | 25% Complete | 1 day    |
-| P3       | Testing Expansion     | 80% Complete | 2-3 days |
+| Metric             | Value | Target |
+| ------------------ | ----- | ------ |
+| Test Files         | 7     | 15+    |
+| Test Lines         | 2,432 | 4,000+ |
+| Statement Coverage | 76%   | 85%+   |
+| Branch Coverage    | 53%   | 70%+   |
+| Accessibility      | 35%   | 90%+   |
+| API Routes         | 0     | 10+    |
+| P0 Items Complete  | 0/3   | 3/3    |
 
 ---
 
-## 📈 Overall Progress
+## 🎯 Recommended Sprint Order
 
-**Completed**: 3 items (25%)
-**In Progress**: 3 items (25%)
-**Not Started**: 5 items (50%)
-
-**Estimated Total Effort**: 17-25 days
-
-**Critical Path**: API Routes → Offline Queue (12-8 days)
+**Sprint 1 (Weeks 1-2)**: P0 items - Security, Offline Queue, API Routes foundation
+**Sprint 2 (Weeks 3-4)**: Complete API routes, Optimistic updates, Query optimization
+**Sprint 3 (Weeks 5-6)**: Debouncing, Validation, Testing expansion
+**Sprint 4 (Weeks 7-8)**: Profile customization, Accessibility, Polish
