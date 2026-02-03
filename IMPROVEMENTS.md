@@ -47,17 +47,6 @@ A prioritized list of improvements needed for the codebase, organized by impact 
   - Sync on connectivity restoration
 - **Estimated Effort**: 2-3 days
 
-### 3. Presence System Integration
-
-- **Issue**: Backend functions exist (`subscribeToUserPresence()`, `updateUserPresence()`) but no integration with app lifecycle
-- **Location**: `app/_db/realtimeService.ts`
-- **Impact**: No online/offline status shown to users
-- **Fix**: Add useEffect hooks for:
-  - Login/logout events
-  - Window focus/blur events
-  - User presence tracking
-- **Estimated Effort**: 1-2 days
-
 ---
 
 ## 🟠 High Priority (P1)
@@ -181,7 +170,6 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 | -------- | --------------------- | ------------ | -------- |
 | P0       | API Routes            | Not Started  | 3-5 days |
 | P0       | Offline Queue         | 40% Complete | 2-3 days |
-| P0       | Presence System       | 0% Complete  | 1-2 days |
 | P1       | Optimistic Updates    | Not Started  | 2-3 days |
 | P1       | Query Optimization    | 30% Complete | 2-3 days |
 | P1       | Debouncing/Rate Limit | Not Started  | 1 day    |
@@ -198,8 +186,8 @@ A prioritized list of improvements needed for the codebase, organized by impact 
 
 **Completed**: 3 items (25%)
 **In Progress**: 3 items (25%)
-**Not Started**: 6 items (50%)
+**Not Started**: 5 items (50%)
 
-**Estimated Total Effort**: 19-27 days
+**Estimated Total Effort**: 17-25 days
 
-**Critical Path**: API Routes → Offline Queue → Presence System (14-10 days)
+**Critical Path**: API Routes → Offline Queue (12-8 days)
