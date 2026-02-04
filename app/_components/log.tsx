@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import LikeButton from "./like-button";
 import styles from "./Log.module.css";
 import { toReadableString } from "../../lib/utils/dateUtils";
@@ -15,37 +15,54 @@ interface LogProps {
 }
 
 export const Log: React.FC<LogProps> = ({ log }) => {
+  const [showAllTags, setShowAllTags] = useState(false);
+  const visibleTags = showAllTags ? log.tags : log.tags.slice(0, 2);
+
   return (
     <div className={styles.logCard}>
       <div className={styles.logHeader}>
         <div className={styles.logHeaderContent}>
-          <h2 className={styles.logTitle}>Practice Log</h2>
+          <div className={styles.headerLeftContent}>
+            <span className={styles.userName}>{log.user}</span>
+            <div className={styles.tagsHeaderContainer}>
+              {log.tags.length === 0 && (
+                <span className={styles.headerTag}>—</span>
+              )}
+              {visibleTags.map((tag, idx) => (
+                <span key={idx} className={styles.headerTag}>
+                  {tag}
+                </span>
+              ))}
+              {!showAllTags && log.tags.length > 2 && (
+                <button
+                  className={styles.moreIndicator}
+                  onClick={() => setShowAllTags(true)}
+                >
+                  +{log.tags.length - 2} more
+                </button>
+              )}
+              {showAllTags && log.tags.length > 2 && (
+                <button
+                  className={styles.moreIndicator}
+                  onClick={() => setShowAllTags(false)}
+                >
+                  show less
+                </button>
+              )}
+            </div>
+          </div>
           <LikeButton logId={log.index?.toString()} />
         </div>
       </div>
       <div className={styles.logBody}>
         <div className={styles.logGrid}>
           <div className={styles.logSection}>
-            <p className={styles.logLabel}>User</p>
-            <p className={styles.logValue}>{log.user}</p>
-          </div>
-          <div className={styles.logSection}>
             <p className={styles.logLabel}>Duration</p>
             <p className={styles.logValue}>{log.duration}</p>
           </div>
-        </div>
-        <div className={styles.sectionSpacing}>
-          <p className={`${styles.logLabel} ${styles.mb1}`}>Date & Time</p>
-          <p className={styles.logValue}>{toReadableString(log.createdAt)}</p>
-        </div>
-        <div className={styles.sectionSpacing}>
-          <p className={`${styles.logLabel} ${styles.mb2}`}>Tags</p>
-          <div className={styles.tagsContainer}>
-            {log.tags.map((tag, idx) => (
-              <span key={idx} className={styles.tag}>
-                {tag}
-              </span>
-            ))}
+          <div className={styles.logSection}>
+            <p className={styles.logLabel}>Date & Time</p>
+            <p className={styles.logValue}>{toReadableString(log.createdAt)}</p>
           </div>
         </div>
         <div className={styles.sectionSpacing}>
