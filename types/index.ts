@@ -15,6 +15,7 @@ export interface UserData {
   profilePicture?: string;
   createdAt?: string;
   updatedAt?: string;
+  tagAnalytics?: Record<string, number>;
 }
 
 /**
@@ -157,7 +158,13 @@ export function isUserData(obj: unknown): obj is UserData {
       typeof userData.profilePicture === "string") &&
     (userData.createdAt === undefined ||
       typeof userData.createdAt === "string") &&
-    (userData.updatedAt === undefined || typeof userData.updatedAt === "string")
+    (userData.updatedAt === undefined ||
+      typeof userData.updatedAt === "string") &&
+    (userData.tagAnalytics === undefined ||
+      typeof userData.tagAnalytics === "object") &&
+    (userData.tagAnalytics === undefined ||
+      userData.tagAnalytics === null ||
+      typeof userData.tagAnalytics === "object")
   );
 }
 

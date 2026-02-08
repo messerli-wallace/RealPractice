@@ -6,6 +6,7 @@ import {
   deleteDoc,
   arrayUnion,
   arrayRemove,
+  runTransaction,
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { isNetworkError } from "../../lib/utils/networkUtils";
@@ -18,6 +19,7 @@ import {
   ErrorMetadata,
 } from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
+import { updateTagAnalytics, decrementTagAnalytics } from "./tagAnalytics";
 
 export const createData = async (
   docPath: string,
@@ -160,16 +162,34 @@ export const addLog = async (
   retryCount = 0
 ): Promise<void> => {
   /*
-    Adds a specific log to the logs array in the docPath
-    */
+     Adds a specific log to the logs array in the docPath
+     */
   if (!validateLogItem(newLog)) {
     throw new Error("Invalid log item data");
   }
 
   try {
     const docRef = doc(db, "users", docPath);
-    await updateDoc(docRef, {
-      logs: arrayUnion(newLog),
+
+    await runTransaction(db, async (transaction) => {
+      const docSnap = await transaction.get(docRef);
+
+      if (!docSnap.exists()) {
+        throw new Error("User document does not exist");
+      }
+
+      const userData = docSnap.data() as UserData;
+      const currentAnalytics = userData.tagAnalytics || {};
+
+      const updatedAnalytics = updateTagAnalytics(
+        currentAnalytics,
+        newLog.tags
+      );
+
+      transaction.update(docRef, {
+        logs: arrayUnion(newLog),
+        tagAnalytics: updatedAnalytics,
+      });
     });
   } catch (error) {
     // Implement retry logic for network errors
@@ -190,12 +210,30 @@ export const removeLog = async (
   retryCount = 0
 ): Promise<void> => {
   /*
-    Deletes a specific log
-    */
+     Deletes a specific log and decrements tag analytics
+     */
   try {
     const docRef = doc(db, "users", docPath);
-    await updateDoc(docRef, {
-      logs: arrayRemove(badLog),
+
+    await runTransaction(db, async (transaction) => {
+      const docSnap = await transaction.get(docRef);
+
+      if (!docSnap.exists()) {
+        throw new Error("User document does not exist");
+      }
+
+      const userData = docSnap.data() as UserData;
+      const currentAnalytics = userData.tagAnalytics || {};
+
+      const updatedAnalytics = decrementTagAnalytics(
+        currentAnalytics,
+        badLog.tags
+      );
+
+      transaction.update(docRef, {
+        logs: arrayRemove(badLog),
+        tagAnalytics: updatedAnalytics,
+      });
     });
   } catch (error) {
     // Implement retry logic for network errors
@@ -351,6 +389,42 @@ export const getUserById = async (
         setTimeout(resolve, 1000 * Math.pow(2, retryCount))
       );
       return getUserById(userId, retryCount + 1);
+    }
+    throw error;
+  }
+};
+
+export const getTagAnalytics = async (
+  userId: string,
+  retryCount = 0
+): Promise<Record<string, number> | undefined> => {
+  /**
+   * Returns tag analytics for a given user ID
+   * Returns undefined if user document doesn't exist or has no analytics
+   */
+  try {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+
+    const validatedData = validateUserData(data);
+    return validatedData?.tagAnalytics;
+  } catch (error) {
+    // Log the error with context
+    if (error instanceof Error) {
+      logError("Failed to get tag analytics", error, {
+        component: "db",
+        function: "getTagAnalytics",
+        metadata: { userId, retryCount },
+      });
+    }
+
+    // Implement retry logic for network errors
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      return getTagAnalytics(userId, retryCount + 1);
     }
     throw error;
   }
