@@ -1,14 +1,14 @@
 .container {
   padding: 1.5rem;
-  background-color: #f8fafc;
-  border-radius: 0.5rem;
-  border: 1px solid #e2e8f0;
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text);
   margin-bottom: 1rem;
 }
 
@@ -17,20 +17,20 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background-color: #e0f2fe;
-  border-radius: 0.375rem;
+  background-color: var(--color-info-bg);
+  border-radius: var(--radius-sm);
   margin-bottom: 1rem;
 }
 
 .totalLabel {
   font-weight: 500;
-  color: #0369a1;
+  color: var(--color-info-text);
 }
 
 .totalValue {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #075985;
+  color: var(--color-text);
 }
 
 .tagList {
@@ -54,32 +54,32 @@
 
 .tagName {
   font-weight: 500;
-  color: #334155;
+  color: var(--color-text);
   text-transform: capitalize;
 }
 
 .tagCount {
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
 }
 
 .progressBar {
   width: 100%;
   height: 0.5rem;
-  background-color: #e2e8f0;
+  background-color: var(--color-border-light);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background-color: #3b82f6;
+  background-color: var(--color-primary);
   border-radius: 9999px;
   transition: width 0.3s ease-in-out;
 }
 
 .emptyText {
-  color: #64748b;
+  color: var(--color-text-secondary);
   font-size: 0.875rem;
   text-align: center;
   padding: 2rem;
