@@ -6,6 +6,7 @@ import LoadingImage from "../../_components/LoadingGif";
 import { getFriends, getUserById, getTagAnalytics } from "../../_db/db";
 import { UserData } from "../../../types/index";
 import { logError } from "../../../lib/utils/errorLogger";
+import Link from "next/link";
 import { Card, Alert } from "../../_components/DesignSystem";
 import { TagAnalytics } from "../../_components/TagAnalytics";
 
@@ -164,26 +165,34 @@ const ProfilePage = () => {
             ) : (
               <div className={styles.friendsGrid}>
                 {friends.map((friend) => (
-                  <Card key={friend.id} className={styles.friendCard}>
-                    <div className={styles.friendContent}>
-                      <div className={styles.friendAvatar}>
-                        {(friend.data?.name || "?").charAt(0).toUpperCase()}
+                  <Link
+                    key={friend.id}
+                    href={`/home/user?userId=${friend.id}`}
+                    className={styles.friendLink}
+                  >
+                    <Card className={styles.friendCard}>
+                      <div className={styles.friendContent}>
+                        <div className={styles.friendAvatar}>
+                          {(friend.data?.name || "?").charAt(0).toUpperCase()}
+                        </div>
+                        <div className={styles.friendInfo}>
+                          <h3 className={styles.friendName}>
+                            {friend.data?.name || "Unknown User"}
+                          </h3>
+                          {friend.data?.bio && (
+                            <p className={styles.friendBio}>
+                              {friend.data.bio}
+                            </p>
+                          )}
+                          {!friend.data && (
+                            <p className={styles.unavailableText}>
+                              User data unavailable
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className={styles.friendInfo}>
-                        <h3 className={styles.friendName}>
-                          {friend.data?.name || "Unknown User"}
-                        </h3>
-                        {friend.data?.bio && (
-                          <p className={styles.friendBio}>{friend.data.bio}</p>
-                        )}
-                        {!friend.data && (
-                          <p className={styles.unavailableText}>
-                            User data unavailable
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             )}

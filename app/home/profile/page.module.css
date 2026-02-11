@@ -86,7 +86,19 @@
   }
 }
 
+.friendLink {
+  text-decoration: none;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.friendLink:hover {
+  transform: translateY(-2px);
+}
+
 .friendCard {
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
   padding: 1rem;
 }
 
