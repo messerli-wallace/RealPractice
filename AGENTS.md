@@ -147,6 +147,39 @@ try {
 - Pattern: Use `beforeEach` to clear mocks/state, `afterEach` for cleanup
 - Path mapping: `@/` resolves to `<rootDir>/`
 
+### CSS Conventions
+
+**Normal CSS with CSS Modules** - No Tailwind or CSS-in-JS libraries.
+
+**File naming:**
+
+- Global styles: `globals.css` (in app/)
+- Component styles: `ComponentName.module.css` (co-located with component)
+- Regular CSS: `ComponentName.css` (for non-modular styles)
+
+**CSS patterns:**
+
+- Use CSS custom properties (variables) from `globals.css` for colors, spacing, shadows
+- Class naming: camelCase (e.g., `.buttonPrimary`, `.navLink`)
+- Use `@layer base` for global resets and typography
+- Support dark mode with `prefers-color-scheme: dark`
+- Define keyframe animations in `globals.css` for reuse
+
+**Example module usage:**
+
+```typescript
+import styles from "./Button.module.css";
+<button className={styles.buttonPrimary}>Click</button>
+```
+
+**Common CSS variables:**
+
+- Colors: `--color-primary`, `--color-bg`, `--color-text`, `--color-error`
+- Spacing: `--spacing-base` (0.25rem base unit)
+- Radius: `--radius-sm`, `--radius-md`, `--radius-lg`
+- Shadows: `--shadow-sm`, `--shadow-md`, `--shadow-lg`
+- Transitions: `--transition-base`
+
 ### Git Hooks
 
 Pre-commit runs `lint-staged` which lints and formats staged files automatically.
