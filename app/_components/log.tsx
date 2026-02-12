@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Link from "next/link";
 import LikeButton from "./like-button";
 import styles from "./Log.module.css";
 import { toReadableString } from "../../lib/utils/dateUtils";
@@ -6,6 +7,7 @@ import { toReadableString } from "../../lib/utils/dateUtils";
 interface LogProps {
   log: {
     user: string;
+    userId: string;
     createdAt: string;
     duration: string;
     tags: string[];
@@ -23,7 +25,12 @@ export const Log: React.FC<LogProps> = ({ log }) => {
       <div className={styles.logHeader}>
         <div className={styles.logHeaderContent}>
           <div className={styles.headerLeftContent}>
-            <span className={styles.userName}>{log.user}</span>
+            <Link
+              href={`/home/user?userId=${log.userId}`}
+              className={styles.userName}
+            >
+              {log.user}
+            </Link>
             <div className={styles.tagsHeaderContainer}>
               {log.tags.length === 0 && (
                 <span className={styles.headerTag}>—</span>

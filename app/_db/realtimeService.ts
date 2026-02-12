@@ -50,6 +50,7 @@ export const subscribeToUserLogs = (
             .filter((log): log is NonNullable<typeof log> => log !== null)
             .map((log) => ({
               user: userData.name || userId,
+              userId: userId,
               createdAt: log.createdAt,
               duration: log.duration,
               tags: log.tags,
@@ -196,6 +197,7 @@ export const subscribeToFriendsLogs = (
                 .filter((log): log is NonNullable<typeof log> => log !== null)
                 .map((log) => ({
                   user: cachedUserData.name || friendId,
+                  userId: friendId,
                   createdAt: log.createdAt,
                   duration: log.duration,
                   tags: log.tags,

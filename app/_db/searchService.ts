@@ -257,6 +257,7 @@ export const searchLogsByCriteria = async (
             type: "log",
             description: log.description || undefined,
             tags: log.tags || undefined,
+            userId: doc.id,
           };
 
           if (validateSearchResultItem(searchItem)) {
@@ -323,6 +324,7 @@ export const searchLogsByTag = async (
               type: "log",
               description: log.description || undefined,
               tags: matchingTags,
+              userId: doc.id,
             };
 
             if (validateSearchResultItem(searchItem)) {

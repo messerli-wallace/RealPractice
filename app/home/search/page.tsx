@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import styles from "./page.module.css";
 import {
   advancedFuzzySearchUsers,
@@ -340,25 +341,36 @@ const SearchPage: React.FC = () => {
                 <p className={styles.emptyText}>No logs found</p>
               </Card>
             ) : (
-              searchResults.logs.map((log) => (
-                <Card key={log.id} className={styles.logCard}>
-                  <div>
-                    <h3 className={styles.logName}>{log.name}</h3>
-                    {log.description && (
-                      <p className={styles.logDescription}>{log.description}</p>
-                    )}
-                    {log.tags && (
-                      <div className={styles.tagsContainer}>
-                        {log.tags.map((tag, index) => (
-                          <span key={index} className={styles.logTag}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              ))
+              searchResults.logs.map((log) => {
+                // Extract userId from log.id if it exists (format is "userId_logId")
+                const logParts = log.id?.split("_");
+                const userId =
+                  logParts && logParts.length > 0 ? logParts[0] : log.userId;
+
+                return (
+                  <Card key={log.id} className={styles.logCard}>
+                    <div>
+                      <Link href={`/home/user?userId=${userId}`}>
+                        <h3 className={styles.logName}>{log.name}</h3>
+                      </Link>
+                      {log.description && (
+                        <p className={styles.logDescription}>
+                          {log.description}
+                        </p>
+                      )}
+                      {log.tags && (
+                        <div className={styles.tagsContainer}>
+                          {log.tags.map((tag, index) => (
+                            <span key={index} className={styles.logTag}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </Card>
+                );
+              })
             )}
           </div>
         </div>

@@ -60,6 +60,7 @@ export interface UserLogData {
  */
 export interface OrganizedLogEntry {
   user: string;
+  userId: string;
   createdAt: string;
   duration: string;
   tags: string[];
@@ -75,6 +76,7 @@ export interface SearchResultItem {
   type: "user" | "log";
   description?: string;
   tags?: string[];
+  userId?: string;
 }
 
 /**
