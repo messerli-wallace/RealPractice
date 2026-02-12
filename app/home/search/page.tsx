@@ -304,27 +304,32 @@ const SearchPage: React.FC = () => {
 
                 return (
                   <Card key={user.id} className={styles.userCard}>
-                    <div className={styles.userCardContent}>
-                      <div className={styles.userAvatar}>
-                        {user.name.charAt(0).toUpperCase()}
+                    <Link
+                      href={`/home/user?userId=${user.id}`}
+                      className={styles.userLink}
+                    >
+                      <div className={styles.userCardContent}>
+                        <div className={styles.userAvatar}>
+                          {user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className={styles.userInfo}>
+                          <h3 className={styles.userName}>{user.name}</h3>
+                          {user.description && (
+                            <p className={styles.userDescription}>
+                              {user.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                      <div className={styles.userInfo}>
-                        <h3 className={styles.userName}>{user.name}</h3>
-                        {user.description && (
-                          <p className={styles.userDescription}>
-                            {user.description}
-                          </p>
-                        )}
-                      </div>
-                      {!isCurrentUser && (
-                        <FollowButton
-                          targetUserId={user.id}
-                          isFollowing={isFollowing}
-                          onFollow={() => handleFollowUser(user.id)}
-                          size="sm"
-                        />
-                      )}
-                    </div>
+                    </Link>
+                    {!isCurrentUser && (
+                      <FollowButton
+                        targetUserId={user.id}
+                        isFollowing={isFollowing}
+                        onFollow={() => handleFollowUser(user.id)}
+                        size="sm"
+                      />
+                    )}
                   </Card>
                 );
               })

@@ -178,6 +178,11 @@
   padding: 1rem;
 }
 
+.userCard .userLink {
+  text-decoration: none;
+  color: inherit;
+}
+
 .userCardContent {
   display: flex;
   align-items: center;
