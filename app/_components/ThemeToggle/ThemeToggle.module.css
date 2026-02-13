@@ -1,0 +1,76 @@
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  color: var(--color-text);
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.themeToggle:hover {
+  background-color: var(--color-border-light);
+  transform: scale(1.05);
+}
+
+.themeToggle:active {
+  transform: scale(0.95);
+}
+
+.themeToggleMd {
+  padding: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.themeToggleSm {
+  padding: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.themeToggleLg {
+  padding: 0.75rem;
+  width: 3rem;
+  height: 3rem;
+}
+
+.themeToggleGhost {
+  background-color: transparent;
+  border: none;
+  padding: 0.5rem;
+}
+
+.themeToggleGhost:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.themeToggleMd .icon,
+.themeToggleLg .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.themeToggleSm .icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.themeToggle .icon {
+  display: block;
+}
+
+@keyframes fadeRotate {
+  0% {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+}

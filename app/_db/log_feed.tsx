@@ -129,6 +129,7 @@ function organizeAndSortData(userData: UserLogData[]): OrganizedLogEntry[] {
         const { createdAt, duration, tags, description } = activity;
         organizedData.push({
           user: userName,
+          userId: userName,
           createdAt,
           duration,
           tags,

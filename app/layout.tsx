@@ -3,6 +3,7 @@ import "./globals.css";
 import {
   AuthContextProvider,
   LogsContextProvider,
+  ThemeContextProvider,
   UIContextProvider,
 } from "./context";
 import { ErrorBoundary } from "./_components/ErrorBoundary";
@@ -25,13 +26,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthContextProvider>
-          <UIContextProvider>
-            <LogsContextProvider>
-              <ErrorBoundary>{children}</ErrorBoundary>
-            </LogsContextProvider>
-          </UIContextProvider>
-        </AuthContextProvider>
+        <ThemeContextProvider>
+          <AuthContextProvider>
+            <UIContextProvider>
+              <LogsContextProvider>
+                <ErrorBoundary>{children}</ErrorBoundary>
+              </LogsContextProvider>
+            </UIContextProvider>
+          </AuthContextProvider>
+        </ThemeContextProvider>
       </body>
     </html>
   );

@@ -25,6 +25,7 @@ jest.mock("../../app/context/AuthContext", () => ({
 const mockLogs: OrganizedLogEntry[] = [
   {
     user: "Test User",
+    userId: "test-user-id",
     duration: "30",
     createdAt: "2024-01-15T15:00:00.000Z",
     description: "Practice session 1",
@@ -32,6 +33,7 @@ const mockLogs: OrganizedLogEntry[] = [
   },
   {
     user: "Other User",
+    userId: "other-user-id",
     duration: "45",
     createdAt: "2024-01-15T19:00:00.000Z",
     description: "Practice session 2",
@@ -39,6 +41,7 @@ const mockLogs: OrganizedLogEntry[] = [
   },
   {
     user: "Test User",
+    userId: "test-user-id",
     duration: "60",
     createdAt: "2024-01-16T14:00:00.000Z",
     description: "Practice session 3",
@@ -248,6 +251,7 @@ describe("LogsContext", () => {
       // First load some logs to set hasMore to true (more than page size of 10)
       const manyLogs = Array.from({ length: 15 }, (_, i) => ({
         user: "Test User",
+        userId: "test-user-id",
         duration: "30",
         createdAt: `2024-01-${String(i + 1).padStart(2, "0")}T15:00:00.000Z`,
         description: `Practice session ${i}`,

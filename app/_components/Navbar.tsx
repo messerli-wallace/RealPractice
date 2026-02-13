@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { UserAuth } from "../context/AuthContext";
+import { ThemeToggle } from "./ThemeToggle";
 import styles from "./Navbar.module.css";
 
 const Navbar = () => {
@@ -125,6 +126,7 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
+                  <ThemeToggle />
                   <Link href="/home/profile">
                     <div className={styles.userProfile}>
                       <div className={styles.userAvatar}>
