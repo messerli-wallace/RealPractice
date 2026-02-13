@@ -62,6 +62,19 @@
   border-color: var(--alert-success-border);
 }
 
+.alertSuccess .alertTitle {
+  color: var(--alert-success-text);
+}
+
+.alertTitle {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.alertTitle {
+  color: var(--alert-success-text);
+}
+
 .alertError {
   background-color: var(--alert-error-bg);
   color: var(--alert-error-text);
