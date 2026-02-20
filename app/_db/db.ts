@@ -298,7 +298,6 @@ export const followUser = async (
       friends: arrayUnion(targetUserId),
     });
   } catch (error) {
-    // Log the error with context
     if (error instanceof Error) {
       logError("Failed to follow user", error, {
         component: "db",
@@ -307,12 +306,45 @@ export const followUser = async (
       });
     }
 
-    // Implement retry logic for network errors
     if (retryCount < 3 && isNetworkError(error)) {
       await new Promise((resolve) =>
         setTimeout(resolve, 1000 * Math.pow(2, retryCount))
       );
       await followUser(currentUserId, targetUserId, retryCount + 1);
+    } else {
+      throw error;
+    }
+  }
+};
+
+export const unfollowUser = async (
+  currentUserId: string,
+  targetUserId: string,
+  retryCount = 0
+): Promise<void> => {
+  /**
+   * Removes targetUserId from currentUser's friends array
+   * Uses arrayRemove to remove the specific user
+   */
+  try {
+    const docRef = doc(db, "users", currentUserId);
+    await updateDoc(docRef, {
+      friends: arrayRemove(targetUserId),
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      logError("Failed to unfollow user", error, {
+        component: "db",
+        function: "unfollowUser",
+        metadata: { currentUserId, targetUserId, retryCount },
+      });
+    }
+
+    if (retryCount < 3 && isNetworkError(error)) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, 1000 * Math.pow(2, retryCount))
+      );
+      await unfollowUser(currentUserId, targetUserId, retryCount + 1);
     } else {
       throw error;
     }

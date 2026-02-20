@@ -6,6 +6,8 @@ import {
   addLog,
   removeLog,
   docExists,
+  followUser,
+  unfollowUser,
 } from "../../app/_db/db";
 import { setDoc, getDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { validateUserData, validateLogItem } from "../../types/index";
@@ -347,5 +349,81 @@ describe("Database Operations", () => {
       expect(getDoc).toHaveBeenCalledTimes(2);
       expect(result).toBe(true);
     });
+  });
+
+  describe("followUser", () => {
+    const currentUserId = "user123";
+    const targetUserId = "user456";
+
+    it("adds user to friends array", async () => {
+      (updateDoc as jest.Mock).mockResolvedValue(undefined);
+
+      await followUser(currentUserId, targetUserId);
+
+      expect(updateDoc).toHaveBeenCalledWith(undefined, {
+        friends: { __op: "arrayUnion", item: targetUserId },
+      });
+    });
+
+    it("retries on network error", async () => {
+      (isNetworkError as jest.Mock).mockReturnValue(true);
+      (updateDoc as jest.Mock)
+        .mockRejectedValueOnce(new Error("network error"))
+        .mockResolvedValueOnce(undefined);
+
+      await followUser(currentUserId, targetUserId);
+
+      expect(updateDoc).toHaveBeenCalledTimes(2);
+    });
+
+    it("throws after max retries and logs error", async () => {
+      (isNetworkError as jest.Mock).mockReturnValue(true);
+      const networkError = new Error("network error");
+      (updateDoc as jest.Mock).mockRejectedValue(networkError);
+
+      await expect(followUser(currentUserId, targetUserId)).rejects.toThrow(
+        "network error"
+      );
+      expect(updateDoc).toHaveBeenCalledTimes(4);
+      expect(logError).toHaveBeenCalled();
+    }, 15000);
+  });
+
+  describe("unfollowUser", () => {
+    const currentUserId = "user123";
+    const targetUserId = "user456";
+
+    it("removes user from friends array", async () => {
+      (updateDoc as jest.Mock).mockResolvedValue(undefined);
+
+      await unfollowUser(currentUserId, targetUserId);
+
+      expect(updateDoc).toHaveBeenCalledWith(undefined, {
+        friends: { __op: "arrayRemove", item: targetUserId },
+      });
+    });
+
+    it("retries on network error", async () => {
+      (isNetworkError as jest.Mock).mockReturnValue(true);
+      (updateDoc as jest.Mock)
+        .mockRejectedValueOnce(new Error("network error"))
+        .mockResolvedValueOnce(undefined);
+
+      await unfollowUser(currentUserId, targetUserId);
+
+      expect(updateDoc).toHaveBeenCalledTimes(2);
+    });
+
+    it("throws after max retries and logs error", async () => {
+      (isNetworkError as jest.Mock).mockReturnValue(true);
+      const networkError = new Error("network error");
+      (updateDoc as jest.Mock).mockRejectedValue(networkError);
+
+      await expect(unfollowUser(currentUserId, targetUserId)).rejects.toThrow(
+        "network error"
+      );
+      expect(updateDoc).toHaveBeenCalledTimes(4);
+      expect(logError).toHaveBeenCalled();
+    }, 15000);
   });
 });

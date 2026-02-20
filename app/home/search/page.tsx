@@ -8,7 +8,7 @@ import {
   globalSearch,
   searchLogsByCriteria,
 } from "../../_db/searchService";
-import { followUser, getFriends } from "../../_db/db";
+import { followUser, unfollowUser, getFriends } from "../../_db/db";
 import { SearchResultItem } from "../../../types/index";
 import { logError } from "../../../lib/utils/errorLogger";
 import { Input, Button, Card, Alert } from "../../_components/DesignSystem";
@@ -54,23 +54,41 @@ const SearchPage: React.FC = () => {
     loadFriends();
   }, [currentUser?.uid]);
 
-  const handleFollowUser = async (targetUserId: string) => {
+  const handleFollowToggle = async (
+    targetUserId: string,
+    isFollowing: boolean
+  ) => {
     if (!currentUser?.uid) {
       setError("You must be logged in to follow users");
       return;
     }
 
     try {
-      await followUser(currentUser.uid, targetUserId);
-      setFriends((prev) => [...prev, targetUserId]);
+      if (isFollowing) {
+        await unfollowUser(currentUser.uid, targetUserId);
+        setFriends((prev) => prev.filter((id) => id !== targetUserId));
+      } else {
+        await followUser(currentUser.uid, targetUserId);
+        setFriends((prev) => [...prev, targetUserId]);
+      }
     } catch (error) {
       if (error instanceof Error) {
-        logError("Failed to follow user from search page", error, {
-          component: "search",
-          function: "handleFollowUser",
-          metadata: { currentUserId: currentUser.uid, targetUserId },
-        });
-        setError("Failed to follow user. Please try again.");
+        logError(
+          isFollowing
+            ? "Failed to unfollow user from search page"
+            : "Failed to follow user from search page",
+          error,
+          {
+            component: "search",
+            function: "handleFollowToggle",
+            metadata: { currentUserId: currentUser.uid, targetUserId },
+          }
+        );
+        setError(
+          isFollowing
+            ? "Failed to unfollow user. Please try again."
+            : "Failed to follow user. Please try again."
+        );
       }
       throw error;
     }
@@ -326,7 +344,9 @@ const SearchPage: React.FC = () => {
                       <FollowButton
                         targetUserId={user.id}
                         isFollowing={isFollowing}
-                        onFollow={() => handleFollowUser(user.id)}
+                        onFollowToggle={() =>
+                          handleFollowToggle(user.id, isFollowing)
+                        }
                         size="sm"
                       />
                     )}

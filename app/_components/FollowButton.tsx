@@ -7,36 +7,34 @@ import { logError } from "../../lib/utils/errorLogger";
 interface FollowButtonProps {
   targetUserId: string;
   isFollowing: boolean;
-  onFollow: () => Promise<void>;
+  onFollowToggle: () => Promise<void>;
   size?: "sm" | "md" | "lg";
 }
 
 export function FollowButton({
   targetUserId,
   isFollowing,
-  onFollow,
+  onFollowToggle,
   size = "sm",
 }: FollowButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFollow = async () => {
-    if (isFollowing) {
-      return;
-    }
-
+  const handleClick = async () => {
     try {
       setIsLoading(true);
-      await onFollow();
+      await onFollowToggle();
     } catch (error) {
       if (error instanceof Error) {
-        logError("Failed to follow user", error, {
-          component: "FollowButton",
-          function: "handleFollow",
-          metadata: { targetUserId },
-        });
+        logError(
+          isFollowing ? "Failed to unfollow user" : "Failed to follow user",
+          error,
+          {
+            component: "FollowButton",
+            function: "handleClick",
+            metadata: { targetUserId, isFollowing },
+          }
+        );
       }
-      // Error is already logged, we just show the button as not clicked
-      // The parent component can show a toast or other notification
     } finally {
       setIsLoading(false);
     }
@@ -44,8 +42,8 @@ export function FollowButton({
 
   return (
     <Button
-      onClick={handleFollow}
-      disabled={isFollowing || isLoading}
+      onClick={handleClick}
+      disabled={isLoading}
       isLoading={isLoading}
       variant={isFollowing ? "secondary" : "primary"}
       size={size}
