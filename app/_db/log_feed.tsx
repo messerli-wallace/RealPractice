@@ -133,7 +133,9 @@ function organizeAndSortData(userData: UserLogData[]): OrganizedLogEntry[] {
           createdAt,
           duration,
           tags,
-          description,
+          // Ensure description is a string (LogItem requires string, LogEntry allows null)
+          description: description ?? "",
+          // id is optional in LogItem, not available in LogEntry
         });
       } else {
         console.warn("Invalid log entry skipped:", activity);

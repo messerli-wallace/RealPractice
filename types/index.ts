@@ -57,15 +57,12 @@ export interface UserLogData {
 
 /**
  * Organized log entry with user information
+ * Extends LogItem to preserve all log fields (including id) for operations like delete
  */
-export interface OrganizedLogEntry {
+export type OrganizedLogEntry = LogItem & {
   user: string;
   userId: string;
-  createdAt: string;
-  duration: string;
-  tags: string[];
-  description: string | null;
-}
+};
 
 /**
  * Search result item with specific properties
