@@ -1,24 +1,57 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import LikeButton from "./like-button";
 import styles from "./Log.module.css";
 import { toReadableString } from "../../lib/utils/dateUtils";
+import { UserAuth } from "../context/AuthContext";
+import { removeLog } from "../_db/db";
+import type { OrganizedLogEntry, LogItem } from "../../types/index";
 
 interface LogProps {
-  log: {
-    user: string;
-    userId: string;
-    createdAt: string;
-    duration: string;
-    tags: string[];
-    description: string | null;
-    index: number;
-  };
+  log: OrganizedLogEntry & { index: number };
 }
 
 export const Log: React.FC<LogProps> = ({ log }) => {
   const [showAllTags, setShowAllTags] = useState(false);
+  const [showDeleteMenu, setShowDeleteMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { user: currentUser } = UserAuth();
+
   const visibleTags = showAllTags ? log.tags : log.tags.slice(0, 2);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowDeleteMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this log?"
+    );
+    if (!confirmed) return;
+
+    try {
+      // The log object includes extra fields (user, userId) added for display.
+      // The stored log in Firestore does not have these fields, so we need to
+      // create a clean LogItem object containing only the original log fields.
+      const { user: _user, userId: ownerId, ...logItem } = log;
+      await removeLog(ownerId, logItem as LogItem);
+      setShowDeleteMenu(false);
+    } catch (error) {
+      console.error("Failed to delete log:", error);
+      // Optionally show an error message to the user
+    }
+  };
 
   return (
     <div className={styles.logCard}>
@@ -58,7 +91,39 @@ export const Log: React.FC<LogProps> = ({ log }) => {
               )}
             </div>
           </div>
-          <LikeButton logId={log.index?.toString()} />
+          <div className={styles.headerActions}>
+            <LikeButton logId={log.index?.toString()} />
+            {currentUser && log.userId === currentUser.uid && (
+              <div className={styles.menuContainer} ref={menuRef}>
+                <button
+                  className={styles.menuButton}
+                  onClick={() => setShowDeleteMenu(!showDeleteMenu)}
+                  aria-label="Open menu"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <circle cx="5" cy="12" r="2" />
+                    <circle cx="12" cy="12" r="2" />
+                    <circle cx="19" cy="12" r="2" />
+                  </svg>
+                </button>
+                {showDeleteMenu && (
+                  <div className={styles.dropdownMenu}>
+                    <button
+                      className={styles.deleteMenuItem}
+                      onClick={handleDelete}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className={styles.logBody}>

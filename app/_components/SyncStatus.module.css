@@ -1,0 +1,112 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm, 0.25rem);
+  padding: var(--spacing-xs, 0.125rem) var(--spacing-sm, 0.25rem);
+  border-radius: var(--radius-md, 0.375rem);
+  font-size: 0.875rem;
+  transition: all var(--transition-base, 150ms ease);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs, 0.125rem);
+}
+
+.icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.text {
+  font-weight: 500;
+}
+
+.online {
+  color: var(--color-success, #10b981);
+}
+
+.offline {
+  color: var(--color-warning, #f59e0b);
+  background-color: rgba(245, 158, 11, 0.1);
+  padding: var(--spacing-xs, 0.125rem) var(--spacing-sm, 0.25rem);
+  border-radius: var(--radius-md, 0.375rem);
+}
+
+.offlineIndicator {
+  color: var(--color-warning, #f59e0b);
+}
+
+.pending {
+  color: var(--color-primary, #3b82f6);
+}
+
+.syncing {
+  color: var(--color-primary, #3b82f6);
+  background-color: rgba(59, 130, 246, 0.1);
+  padding: var(--spacing-xs, 0.125rem) var(--spacing-sm, 0.25rem);
+  border-radius: var(--radius-md, 0.375rem);
+}
+
+.syncButton {
+  margin-left: var(--spacing-xs, 0.125rem);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-primary, #3b82f6);
+  background: transparent;
+  border: 1px solid var(--color-primary, #3b82f6);
+  border-radius: var(--radius-sm, 0.25rem);
+  cursor: pointer;
+  transition: all var(--transition-base, 150ms ease);
+}
+
+.syncButton:hover:not(:disabled) {
+  background-color: var(--color-primary, #3b82f6);
+  color: white;
+}
+
+.syncButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .online {
+    color: var(--color-success-dark, #34d399);
+  }
+
+  .offline, .offlineIndicator {
+    color: var(--color-warning-dark, #fbbf24);
+    background-color: rgba(251, 191, 36, 0.1);
+  }
+
+  .pending, .syncing {
+    color: var(--color-primary-dark, #60a5fa);
+    background-color: rgba(96, 165, 250, 0.1);
+  }
+
+  .syncButton {
+    color: var(--color-primary-dark, #60a5fa);
+    border-color: var(--color-primary-dark, #60a5fa);
+  }
+
+  .syncButton:hover:not(:disabled) {
+    background-color: var(--color-primary-dark, #60a5fa);
+    color: white;
+  }
+}

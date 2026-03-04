@@ -7,10 +7,14 @@ import {
   Unsubscribe,
 } from "firebase/firestore";
 import { db, isConfigured } from "../firebase";
-import { UserData, OrganizedLogEntry } from "../../types/index";
+import {
+  UserData,
+  LogItem,
+  OrganizedLogEntry,
+  validateLogItem,
+} from "../../types/index";
 import { logError } from "../../lib/utils/errorLogger";
 import { compareDates } from "../../lib/utils/dateUtils";
-import { extractLogFromFirebase } from "../../lib/utils/firebaseDataUtils";
 
 function getDb(): Firestore {
   if (!isConfigured || !db) {
@@ -46,15 +50,11 @@ export const subscribeToUserLogs = (
           const logs = userData.logs || [];
 
           const organizedLogs: OrganizedLogEntry[] = logs
-            .map((log) => extractLogFromFirebase(log))
-            .filter((log): log is NonNullable<typeof log> => log !== null)
+            .filter((log): log is LogItem => validateLogItem(log) !== null)
             .map((log) => ({
+              ...log,
               user: userData.name || userId,
               userId: userId,
-              createdAt: log.createdAt,
-              duration: log.duration,
-              tags: log.tags,
-              description: log.description,
             }));
 
           organizedLogs.sort((a, b) => compareDates(a.createdAt, b.createdAt));
@@ -193,15 +193,11 @@ export const subscribeToFriendsLogs = (
             if (cachedUserData) {
               const logs = cachedUserData.logs || [];
               const userLogs = logs
-                .map((log) => extractLogFromFirebase(log))
-                .filter((log): log is NonNullable<typeof log> => log !== null)
+                .filter((log): log is LogItem => validateLogItem(log) !== null)
                 .map((log) => ({
+                  ...log,
                   user: cachedUserData.name || friendId,
                   userId: friendId,
-                  createdAt: log.createdAt,
-                  duration: log.duration,
-                  tags: log.tags,
-                  description: log.description,
                 }));
               combinedLogs.push(...userLogs);
             }
