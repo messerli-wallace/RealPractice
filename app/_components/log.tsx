@@ -41,10 +41,10 @@ export const Log: React.FC<LogProps> = ({ log }) => {
     if (!confirmed) return;
 
     try {
-      // The log object includes extra fields (user, userId) added for display.
+      // The log prop includes extra fields (user, userId, index) for display.
       // The stored log in Firestore does not have these fields, so we need to
       // create a clean LogItem object containing only the original log fields.
-      const { user: _user, userId: ownerId, ...logItem } = log;
+      const { user: _user, userId: ownerId, index: _index, ...logItem } = log;
       await removeLog(ownerId, logItem as LogItem);
       setShowDeleteMenu(false);
     } catch (error) {
