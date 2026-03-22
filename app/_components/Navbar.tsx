@@ -139,7 +139,7 @@ const Navbar = () => {
                         </svg>
                       </div>
                       <span className={styles.userName}>
-                        {user.displayName}
+                        {user.displayName?.split(" ")[0] || "User"}
                       </span>
                     </div>
                   </Link>
